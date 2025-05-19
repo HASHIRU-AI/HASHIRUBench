@@ -37,14 +37,17 @@ def compute_feedback(guess: str, solution: str) -> str:
 def sanitize_guess(raw: str) -> str:
     """Extract a 5-letter guess from any model output."""
     raw = raw.lower()
-    m = re.search(r"\b[a-z]{5}\b", raw)
+    regex = r"{\"guess\":\s*\"(\w*)\"}"
+    m = re.search(regex, raw)
     if m:
-        return m.group(0)
-    cleaned = re.sub(r"[^a-z]", "", raw)
-    return cleaned[-5:]
+        return m.group(1)
 
 def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
-    client = Client("http://127.0.0.1:7860/")
+    client = Client("http://127.0.0.1:7860/hashiru/")
+    client.predict(
+		modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+		api_name="/update_model"
+    )
     os.makedirs("results", exist_ok=True)
     out_path = os.path.join(
         "results", f"wordle_benchmark_{datetime.now():%Y%m%d_%H%M%S}.jsonl"
@@ -57,36 +60,38 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
         guesses, attempts = [], 0
         start_time = time.time()
 
-        while attempts < max_guesses:
-            history_txt = "\n".join(f"Guess: {g}, Feedback: {f}" for g, f in guesses)
-            prompt = (
-                "Wordle game. Guess the 5-letter word.\n"
-                + (history_txt + "\n" if history_txt else "")
-                + "Respond with a single 5-letter guess ONLY (no punctuation).\n"
-                + "Feedback legend: G = green (correct spot), Y = yellow (wrong spot), "
-                + "B = black (letter not present)."
+        prompt = (
+                "We are playing a game of Wordle. The solution is a 5-letter word.\n"
+                "You will be given a guess and feedback in the form of G (green), Y (yellow), and B (black).\n"
+                "Your task is to guess the solution word.\n"
+                "I have selected the word, now start guessing!\n"
+                "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
+                "Feel free to take help from agents or tools.\n"
             )
 
-            response, _history = client.predict(
+        while attempts < max_guesses:
+            job = client.submit(
                 message={"text": prompt.strip(), "files": []},
                 api_name="/chat",
             )
+            while not job.done():
+                time.sleep(0.1)
+            response, _history = job.outputs()[-1]
             print("⇢ model said:", repr(_history))
-            raw = response if isinstance(response, str) else response.get("text", "")
-            guess = sanitize_guess(raw)
-
+            guess = sanitize_guess(_history[-1].get("content", ""))
             if len(guess) != 5 or guess not in WORD_LIST:
                 print(f"Warning: '{guess}' invalid; retrying without using a turn.")
+                prompt = "The guess is not 5 letters or not in the word list. Please try again.\n"
                 continue
-
+            print(f"Initial guess: {guess}")
             feedback = compute_feedback(guess, solution)
+            print(f"Feedback: {feedback}")
+            prompt = f"Guess: {guess}, Feedback: {feedback}\n"
             guesses.append((guess, feedback))
             attempts += 1
             print(f"Attempt {attempts}: {guess} -> {feedback}")
-
             if feedback == "GGGGG":
                 break
-
         results.append(
             {
                 "solution": solution,
@@ -96,11 +101,9 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "time": time.time() - start_time,
             }
         )
-        with open(out_path, "a") as f:
-            f.write(json.dumps(results[-1]) + "\n")
 
     print(f"Benchmark complete, results saved to {out_path}")
     return results
 
 if __name__ == "__main__":
-    benchmark_wordle(num_games=20)
+    print(benchmark_wordle(num_games=10))
