@@ -69,7 +69,6 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "Your task is to guess the solution word.\n"
                 "I have selected the word, now start guessing!\n"
                 "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
-                "Feel free to take help from agents or tools.\n"
             )
 
         while attempts < max_guesses:
@@ -113,4 +112,4 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
     return results
 
 if __name__ == "__main__":
-    print(benchmark_wordle(num_games=10))
+    print(benchmark_wordle(num_games=10, max_guesses=20))
