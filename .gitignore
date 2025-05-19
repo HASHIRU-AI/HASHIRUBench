@@ -1,0 +1,19 @@
+*venv/
+__pycache__/
+*.pyc
+.env
+.gradio
+results/
+
+# pdf with latex intermediate files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+secret_word.json
+src/data/
