@@ -63,6 +63,9 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
         prompt = (
                 "We are playing a game of Wordle. The solution is a 5-letter word.\n"
                 "You will be given a guess and feedback in the form of G (green), Y (yellow), and B (black).\n"
+                "G means the letter is in the correct position.\n"
+                "Y means the letter is in the word but in the wrong position.\n"
+                "B means the letter is not in the word.\n"
                 "Your task is to guess the solution word.\n"
                 "I have selected the word, now start guessing!\n"
                 "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
@@ -79,9 +82,10 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             response, _history = job.outputs()[-1]
             print("⇢ model said:", repr(_history))
             guess = sanitize_guess(_history[-1].get("content", ""))
-            if len(guess) != 5 or guess not in WORD_LIST:
+            if not guess or (len(guess) != 5 or guess not in WORD_LIST):
                 print(f"Warning: '{guess}' invalid; retrying without using a turn.")
-                prompt = "The guess is not 5 letters or not in the word list. Please try again.\n"
+                prompt = "The guess is not 5 letters, not in the word list, or doesn't follow the schema. Please try again.\n"
+                time.sleep(5)
                 continue
             print(f"Initial guess: {guess}")
             feedback = compute_feedback(guess, solution)
@@ -101,6 +105,9 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "time": time.time() - start_time,
             }
         )
+        # write entire results to file
+        with open(out_path, "w") as f:
+            f.write(json.dumps(results, indent=2) + "\n")
 
     print(f"Benchmark complete, results saved to {out_path}")
     return results
