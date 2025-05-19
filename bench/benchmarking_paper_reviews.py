@@ -4,6 +4,7 @@ import json
 import time
 import os
 from datetime import datetime
+from time import sleep
 
 def get_last_assistant_content(resp):
     """
@@ -42,7 +43,7 @@ def benchmark_paper_reviews(
     Benchmark agent performance on paper reviews.
 
     Args:
-        csv_path: path to the pipe‑separated CSV of papers + existing reviews
+        csv_path: path to the pipe-separated CSV of papers + existing reviews
         id_col:    name of the column containing unique paper IDs
         text_col:  name of the column containing the full paper text
         num_samples: if set, randomly sample this many papers
@@ -74,8 +75,7 @@ def benchmark_paper_reviews(
         prompt = "Create THREE agents with relevant personalities, expertise, and review styles. " \
                 "Each agent should provide a review of the paper, and recommend Accept/Reject for ICLR 2023. " \
                 "The review should be detailed and include strengths and weaknesses. " \
-                "You can use ArxivTool and WikipediaTool to get more information about novelty and correctness. " \
-                "Finish the entire review and do not stop in the middle. " \
+                "Finish the entire review and DO NOT STOP in the middle. " \
                 "GIVE A FINAL DECISION in the form of \"FINAL DECISION: <Accept/Reject>\". " \
                 "The paper title is: " + title + "\n\n" + row[text_col]
         print(f"[{idx+1}/{len(df)}] Paper ID: {paper_id}")
@@ -83,9 +83,25 @@ def benchmark_paper_reviews(
         try:
             start = time.time()
             resp, history = client.predict(
-                message={"text": prompt, "files": []},
+                {"text": prompt, "files": []},
+                None,
                 api_name="/chat"
             )
+
+            content = get_last_assistant_content(history)
+            print(content)
+            while "FINAL DECISION" not in content.upper():
+                sleep(5)
+                print("…no final verdict yet, asking the agent to continue")
+                resp, history = client.predict(
+                    # send just “continue” (or “please continue”)
+                    {"text": "Please finish the review and give the FINAL DECISION line.", "files": []},
+                    history,            # include the full chat history
+                    api_name="/chat"
+                )
+                content = get_last_assistant_content(history)
+                print(content)
+                sleep(5)
             elapsed = time.time() - start
 
             result = {
