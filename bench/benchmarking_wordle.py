@@ -21,7 +21,7 @@ WORD_LIST = load_word_list()
 
 def compute_feedback(guess: str, solution: str) -> str:
     """Return a 5-char string of G/Y/X feedback."""
-    feedback = ["B"] * 5
+    feedback = ["X"] * 5
     sol = list(solution)
     # Greens first
     for i, g in enumerate(guess):
