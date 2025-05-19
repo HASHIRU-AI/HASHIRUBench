@@ -20,7 +20,7 @@ def load_word_list():
 WORD_LIST = load_word_list()
 
 def compute_feedback(guess: str, solution: str) -> str:
-    """Return a 5-char string of G/Y/B feedback."""
+    """Return a 5-char string of G/Y/X feedback."""
     feedback = ["B"] * 5
     sol = list(solution)
     # Greens first
@@ -29,7 +29,7 @@ def compute_feedback(guess: str, solution: str) -> str:
             feedback[i], sol[i] = "G", None
     # Yellows second
     for i, g in enumerate(guess):
-        if feedback[i] == "B" and g in sol:
+        if feedback[i] == "X" and g in sol:
             feedback[i] = "Y"
             sol[sol.index(g)] = None
     return "".join(feedback)
@@ -62,10 +62,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
 
         prompt = (
                 "We are playing a game of Wordle. The solution is a 5-letter word.\n"
-                "You will be given a guess and feedback in the form of G (green), Y (yellow), and B (black).\n"
-                "G means the letter is in the correct position.\n"
-                "Y means the letter is in the word but in the wrong position.\n"
-                "B means the letter is not in the word.\n"
+                "You will be given a guess and feedback in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist).\n"
                 "Your task is to guess the solution word.\n"
                 "I have selected the word, now start guessing!\n"
                 "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
@@ -84,7 +81,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             if not guess or (len(guess) != 5 or guess not in WORD_LIST):
                 print(f"Warning: '{guess}' invalid; retrying without using a turn.")
                 prompt = "The guess is not 5 letters, not in the word list, or doesn't follow the schema. Please try again.\n"
-                time.sleep(5)
+                time.sleep(60)
                 continue
             print(f"Initial guess: {guess}")
             feedback = compute_feedback(guess, solution)
@@ -95,6 +92,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             print(f"Attempt {attempts}: {guess} -> {feedback}")
             if feedback == "GGGGG":
                 break
+            time.sleep(5)
         results.append(
             {
                 "solution": solution,
@@ -112,4 +110,4 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
     return results
 
 if __name__ == "__main__":
-    print(benchmark_wordle(num_games=10, max_guesses=20))
+    print(benchmark_wordle(num_games=10, max_guesses=15))
