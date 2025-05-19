@@ -6,6 +6,7 @@ import random
 import os
 from datetime import datetime
 import re
+from time import sleep
 
 def get_last_assistant_content(resp):
     """
@@ -43,13 +44,14 @@ def get_last_assistant_content(resp):
 
     return ""
 
-def benchmark_hle(num_samples=20, categories=None):
+def benchmark_hle(num_samples=20, categories=None, offset=0):
     """
     Benchmark agent performance on HLE dataset
     
     Args:
         num_samples: Number of samples to test
         categories: List of categories to include (None for all)
+        offset: Number of samples to skip before starting the benchmark
     """
     # Load HLE dataset
     print("Loading HLE dataset...")
@@ -94,7 +96,7 @@ def benchmark_hle(num_samples=20, categories=None):
     for i, sample in enumerate(samples):
         print(f"\nProcessing sample {i+1}/{len(samples)}")
         category = sample.get('category', 'Unknown')
-        prompt = sample.get('question', '')
+        prompt = sample.get('question', '') + "\n" + "Solve the above question. You MUST not ask the user for any clarifications. You MUST use tools/agents to help you. Deep research and answer the question always."
         print(f"Category: {category}")
         print(f"Question: {prompt[:100]}...")
         
@@ -141,7 +143,7 @@ def benchmark_hle(num_samples=20, categories=None):
             print(f"Response: {response[:100]}...")
             
             # Add a delay to avoid overwhelming the server
-            time.sleep(1)
+            time.sleep(5)
             
         except Exception as e:
             print(f"Error processing sample: {e}")
@@ -169,6 +171,7 @@ def benchmark_hle(num_samples=20, categories=None):
 
 if __name__ == "__main__":
     benchmark_hle(
-        num_samples=1,
-        categories=None
+        num_samples=20,
+        categories=None,
+        offset=0,  # Adjust as needed for your dataset
     )
