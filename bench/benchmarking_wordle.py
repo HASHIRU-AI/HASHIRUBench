@@ -43,11 +43,6 @@ def sanitize_guess(raw: str) -> str:
         return m.group(1)
 
 def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
-    client = Client("http://127.0.0.1:7860/hashiru/")
-    client.predict(
-		modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-		api_name="/update_model"
-    )
     os.makedirs("results", exist_ok=True)
     out_path = os.path.join(
         "results", f"wordle_benchmark_{datetime.now():%Y%m%d_%H%M%S}.jsonl"
@@ -55,6 +50,11 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
     results = []
 
     for gi in range(num_games):
+        client = Client("http://127.0.0.1:7860/hashiru/")
+        client.predict(
+            modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+            api_name="/update_model"
+        )
         solution = random.choice(WORD_LIST)
         print(f"Game {gi+1}/{num_games}, solution: {solution}")
         guesses, attempts = [], 0
