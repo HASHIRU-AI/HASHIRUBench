@@ -1,0 +1,514 @@
+[
+  {
+    "solution": "spiky",
+    "guesses": [
+      [
+        "crane",
+        "XXXXX"
+      ],
+      [
+        "boule",
+        "XXXXX"
+      ],
+      [
+        "shirk",
+        "GXGXY"
+      ],
+      [
+        "spiky",
+        "GGGGG"
+      ]
+    ],
+    "solved": true,
+    "turns": 4,
+    "time": 63.717801570892334
+  },
+  {
+    "solution": "hiver",
+    "guesses": [
+      [
+        "crane",
+        "XYXXY"
+      ],
+      [
+        "biped",
+        "XGXGX"
+      ],
+      [
+        "rifle",
+        "YGXXY"
+      ],
+      [
+        "shire",
+        "XYYYY"
+      ],
+      [
+        "throe",
+        "XYYXY"
+      ],
+      [
+        "hirer",
+        "GGXGG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 294.20748686790466
+  },
+  {
+    "solution": "solid",
+    "guesses": [
+      [
+        "crane",
+        "XXXXX"
+      ],
+      [
+        "slump",
+        "GYXXX"
+      ],
+      [
+        "shout",
+        "GXYXX"
+      ],
+      [
+        "silly",
+        "GYGXX"
+      ],
+      [
+        "skill",
+        "GXYYX"
+      ],
+      [
+        "sloid",
+        "GYYGG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 242.09817218780518
+  },
+  {
+    "solution": "frank",
+    "guesses": [
+      [
+        "crane",
+        "XGGGX"
+      ],
+      [
+        "braid",
+        "XGGXX"
+      ],
+      [
+        "growl",
+        "XGXXX"
+      ],
+      [
+        "harry",
+        "XYYXX"
+      ],
+      [
+        "spank",
+        "XXGGG"
+      ],
+      [
+        "frank",
+        "GGGGG"
+      ]
+    ],
+    "solved": true,
+    "turns": 6,
+    "time": 318.1055312156677
+  },
+  {
+    "solution": "netes",
+    "guesses": [
+      [
+        "crane",
+        "XXXYY"
+      ],
+      [
+        "plied",
+        "XXXGX"
+      ],
+      [
+        "stone",
+        "YYXYY"
+      ],
+      [
+        "hymen",
+        "XXXGY"
+      ],
+      [
+        "tunes",
+        "YXYGG"
+      ],
+      [
+        "bents",
+        "XGYYG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 1036.9901068210602
+  },
+  {
+    "solution": "model",
+    "guesses": [
+      [
+        "crane",
+        "XXXXY"
+      ],
+      [
+        "audio",
+        "XXGXY"
+      ],
+      [
+        "lodge",
+        "YGGXY"
+      ],
+      [
+        "godly",
+        "XGGYX"
+      ],
+      [
+        "helps",
+        "XYYXX"
+      ],
+      [
+        "model",
+        "GGGGG"
+      ]
+    ],
+    "solved": true,
+    "turns": 6,
+    "time": 964.9465777873993
+  },
+  {
+    "solution": "nrtta",
+    "guesses": [
+      [
+        "crane",
+        "XGYYX"
+      ],
+      [
+        "urban",
+        "XGXYY"
+      ],
+      [
+        "arnis",
+        "YGYXX"
+      ],
+      [
+        "norma",
+        "GXYXG"
+      ],
+      [
+        "dwarf",
+        "XXYYX"
+      ],
+      [
+        "plant",
+        "XXYYY"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 453.27826285362244
+  },
+  {
+    "solution": "mimed",
+    "guesses": [
+      [
+        "crane",
+        "XXXXY"
+      ],
+      [
+        "built",
+        "XXYXX"
+      ],
+      [
+        "wiped",
+        "XGXGG"
+      ],
+      [
+        "fixed",
+        "XGXGG"
+      ],
+      [
+        "sized",
+        "XGXGG"
+      ],
+      [
+        "hided",
+        "XGXGG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 356.26077675819397
+  },
+  {
+    "solution": "fubby",
+    "guesses": [
+      [
+        "crane",
+        "XXXXX"
+      ],
+      [
+        "build",
+        "YGXXX"
+      ],
+      [
+        "bushy",
+        "YGXXG"
+      ],
+      [
+        "tubby",
+        "XGGGG"
+      ],
+      [
+        "bubby",
+        "XGGGG"
+      ],
+      [
+        "bubby",
+        "XGGGG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 258.5701627731323
+  },
+  {
+    "solution": "jails",
+    "guesses": [
+      [
+        "crane",
+        "XXYXX"
+      ],
+      [
+        "bumpy",
+        "XXXXX"
+      ],
+      [
+        "allow",
+        "YYXXX"
+      ],
+      [
+        "salad",
+        "YGYXX"
+      ],
+      [
+        "sails",
+        "XGGGG"
+      ],
+      [
+        "hails",
+        "XGGGG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 360.15378308296204
+  },
+  {
+    "solution": "dicht",
+    "guesses": [
+      [
+        "crane",
+        "YXXXX"
+      ],
+      [
+        "build",
+        "XXYXY"
+      ],
+      [
+        "dicky",
+        "GGGXX"
+      ],
+      [
+        "dicot",
+        "GGGXG"
+      ],
+      [
+        "dicts",
+        "GGGYX"
+      ],
+      [
+        "ditch",
+        "GGYYY"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 620.5319936275482
+  },
+  {
+    "solution": "roved",
+    "guesses": [
+      [
+        "crane",
+        "XYXXY"
+      ],
+      [
+        "slump",
+        "XXXXX"
+      ],
+      [
+        "where",
+        "XXYYX"
+      ],
+      [
+        "river",
+        "GXGGX"
+      ],
+      [
+        "roved",
+        "GGGGG"
+      ]
+    ],
+    "solved": true,
+    "turns": 5,
+    "time": 675.0054128170013
+  },
+  {
+    "solution": "taped",
+    "guesses": [
+      [
+        "crane",
+        "XXYXY"
+      ],
+      [
+        "aegis",
+        "YYXXX"
+      ],
+      [
+        "ahead",
+        "YXYXG"
+      ],
+      [
+        "bated",
+        "XGYGG"
+      ],
+      [
+        "taped",
+        "GGGGG"
+      ]
+    ],
+    "solved": true,
+    "turns": 5,
+    "time": 388.39899015426636
+  },
+  {
+    "solution": "murry",
+    "guesses": [
+      [
+        "crane",
+        "XYXXX"
+      ],
+      [
+        "crane",
+        "XYXXX"
+      ],
+      [
+        "roast",
+        "YXXXX"
+      ],
+      [
+        "build",
+        "XGXXX"
+      ],
+      [
+        "funny",
+        "XGXXG"
+      ],
+      [
+        "hurry",
+        "XGGGG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 606.5230243206024
+  },
+  {
+    "solution": "crawl",
+    "guesses": [
+      [
+        "crane",
+        "GGGXX"
+      ],
+      [
+        "bowls",
+        "XXYYX"
+      ],
+      [
+        "crawl",
+        "GGGGG"
+      ]
+    ],
+    "solved": true,
+    "turns": 3,
+    "time": 132.92417216300964
+  },
+  {
+    "solution": "laggy",
+    "guesses": [
+      [
+        "crane",
+        "XXYXX"
+      ],
+      [
+        "blind",
+        "XYXXX"
+      ],
+      [
+        "nylon",
+        "XYYXX"
+      ],
+      [
+        "fluky",
+        "XYXXG"
+      ],
+      [
+        "salty",
+        "XGYXG"
+      ],
+      [
+        "gally",
+        "YGYXG"
+      ]
+    ],
+    "solved": false,
+    "turns": 6,
+    "time": 781.4299848079681
+  },
+  {
+    "solution": "niter",
+    "guesses": [
+      [
+        "crane",
+        "XYXYY"
+      ],
+      [
+        "belly",
+        "XYXXX"
+      ],
+      [
+        "stern",
+        "XYYYY"
+      ],
+      [
+        "enter",
+        "XYGGG"
+      ],
+      [
+        "niter",
+        "GGGGG"
+      ]
+    ],
+    "solved": true,
+    "turns": 5,
+    "time": 142.74989891052246
+  }
+]
