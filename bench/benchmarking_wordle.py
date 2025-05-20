@@ -37,7 +37,7 @@ def compute_feedback(guess: str, solution: str) -> str:
 def sanitize_guess(raw: str) -> str:
     """Extract a 5-letter guess from any model output."""
     raw = raw.lower()
-    regex = r"{\"guess\":\s*\"(\w*)\"}"
+    regex = r"{[\"\']guess[\"\']:\s*[\"\'](\w*)[\"\']}"
     m = re.search(regex, raw)
     if m:
         return m.group(1)
@@ -64,9 +64,10 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "We are playing a game of Wordle. The solution is a 5-letter word.\n"
                 "You will be given a guess and feedback in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist).\n"
                 "Your task is to guess the solution word.\n"
-                "I have selected the word, now start guessing!\n"
+                "Use agents and tools as nessesary to guess the word.\n"
                 "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
-                "Use agents and tools to help you guess the word.\n"
+                "I have selected the word, now start guessing!\n"
+                "Your first guess is:\n"
             )
         letters_not_in_word = set()
 
@@ -74,7 +75,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             print(f"Attempt {attempts + 1}/{max_guesses}")
             print("prompt:", repr(prompt))
             job = client.submit(
-                message={"text": prompt.strip(), "files": []},
+                message={"text": prompt.strip()},
                 api_name="/chat",
             )
             while not job.done():
@@ -82,10 +83,20 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             response, _history = job.outputs()[-1]
             print("⇢ model said:", repr(_history))
             guess = sanitize_guess(_history[-1].get("content", ""))
-            if not guess or (len(guess) != 5 or guess not in WORD_LIST):
-                print(f"Warning: '{guess}' invalid; retrying without using a turn.")
-                prompt = "The guess is not 5 letters, not in the word list, or doesn't follow the schema. Please try again.\n"
+            if not guess:
+                print("Warning: empty guess; retrying without using a turn.")
+                prompt = "The guess is empty. This could be due to timeout or output not matching the expected format (\{\"guess\":\"<WORD>\"\}). Please try again.\n"
                 time.sleep(60)
+                continue
+            if len(guess) != 5:
+                print(f"guess: {guess} not 5 letters")
+                prompt = "The guess is not 5 letters. Please try again.\n"
+                time.sleep(5)
+                continue
+            if guess not in WORD_LIST:
+                print(f"guess: {guess} not in word list")
+                prompt = "The guess is not in the word list. Please try again.\n"
+                time.sleep(5)
                 continue
             print(f"Initial guess: {guess}")
             feedback = compute_feedback(guess, solution)
@@ -100,7 +111,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "guess": guess,
                 "feedback": feedback,
                 "letters_not_in_word": letters_not_in_word,
-                "attempts": attempts,
+                "attempts": f"{attempts}/{max_guesses}",
             }
             prompt = str(prompt)
             print(f"Attempt {attempts}: {guess} -> {feedback}")
@@ -119,9 +130,15 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
         # write entire results to file
         with open(out_path, "w") as f:
             f.write(json.dumps(results, indent=2) + "\n")
+        # set D:\Projects\AI\HASHIRU\src\models\models.json to {}
+        with open("D:\\Projects\\AI\\HASHIRU\\src\\models\\models.json", "w") as f:
+            f.write("{}")
+        # set D:\Projects\AI\HASHIRU\src\data\memory.json to []
+        with open("D:\\Projects\\AI\\HASHIRU\\src\\data\\memory.json", "w") as f:
+            f.write("[]")
 
     print(f"Benchmark complete, results saved to {out_path}")
     return results
 
 if __name__ == "__main__":
-    print(benchmark_wordle(num_games=10, max_guesses=6))
+    print(benchmark_wordle(num_games=1000, max_guesses=6))
