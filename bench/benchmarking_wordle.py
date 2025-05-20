@@ -66,9 +66,13 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "Your task is to guess the solution word.\n"
                 "I have selected the word, now start guessing!\n"
                 "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
+                "Use agents and tools to help you guess the word.\n"
             )
+        letters_not_in_word = set()
 
         while attempts < max_guesses:
+            print(f"Attempt {attempts + 1}/{max_guesses}")
+            print("prompt:", repr(prompt))
             job = client.submit(
                 message={"text": prompt.strip(), "files": []},
                 api_name="/chat",
@@ -85,10 +89,20 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 continue
             print(f"Initial guess: {guess}")
             feedback = compute_feedback(guess, solution)
+            for i in range(5):
+                letter = feedback[i]
+                if letter == "X":
+                    letters_not_in_word.add(guess[i])
             print(f"Feedback: {feedback}")
-            prompt = f"Guess: {guess}, Feedback: {feedback}\n"
             guesses.append((guess, feedback))
             attempts += 1
+            prompt = {
+                "guess": guess,
+                "feedback": feedback,
+                "letters_not_in_word": letters_not_in_word,
+                "attempts": attempts,
+            }
+            prompt = str(prompt)
             print(f"Attempt {attempts}: {guess} -> {feedback}")
             if feedback == "GGGGG":
                 break
@@ -110,4 +124,4 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
     return results
 
 if __name__ == "__main__":
-    print(benchmark_wordle(num_games=10, max_guesses=15))
+    print(benchmark_wordle(num_games=10, max_guesses=6))
