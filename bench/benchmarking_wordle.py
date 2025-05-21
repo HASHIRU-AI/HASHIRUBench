@@ -55,6 +55,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
             api_name="/update_model"
         )
+        client.reset_session()
         solution = random.choice(WORD_LIST)
         print(f"Game {gi+1}/{num_games}, solution: {solution}")
         guesses, attempts = [], 0
@@ -71,17 +72,17 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             )
         letters_not_in_word = set()
 
+        response = ""
+        _history = []
+        
         while attempts < max_guesses:
             print(f"Attempt {attempts + 1}/{max_guesses}")
             print("prompt:", repr(prompt))
-            job = client.submit(
-                message={"text": prompt.strip()},
+            response, _history = client.predict(
+                {"text": prompt.strip()},
+                _history,
                 api_name="/chat",
             )
-            while not job.done():
-                time.sleep(0.1)
-            response, _history = job.outputs()[-1]
-            print("⇢ model said:", repr(_history))
             guess = sanitize_guess(_history[-1].get("content", ""))
             if not guess:
                 print("Warning: empty guess; retrying without using a turn.")
