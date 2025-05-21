@@ -82,12 +82,20 @@ def benchmark_hle(num_samples=20, categories=None, offset=0):
         print(f"Filtered out {removed} samples containing 'image'.")
     all_samples = filtered_samples
     
+    # Apply offset before sampling
+    if offset >= len(all_samples):
+        print(f"Offset {offset} exceeds dataset size {len(all_samples)}. Nothing to benchmark.")
+        return []
+
+    all_samples = all_samples[offset:]
+
     # Select random samples
     if len(all_samples) > num_samples:
+        random.seed(42)
         samples = random.sample(all_samples, num_samples)
     else:
         samples = all_samples
-        print(f"Warning: Only found {len(samples)} samples after filtering.")
+        print(f"Warning: Only found {len(samples)} samples after filtering and offset.")
     
     print(f"Running benchmark on {len(samples)} samples...")
     
@@ -96,7 +104,7 @@ def benchmark_hle(num_samples=20, categories=None, offset=0):
     for i, sample in enumerate(samples):
         print(f"\nProcessing sample {i+1}/{len(samples)}")
         category = sample.get('category', 'Unknown')
-        prompt = sample.get('question', '') + "\n" + "Solve the above question. You MUST not ask the user for any clarifications. You MUST use tools/agents to help you. Deep research and answer the question always."
+        prompt = sample.get('question', '') + "\n" + "Solve the above question. You MUST not ask the user for any clarifications. You MUST use tools/agents to help you. Deep research and answer the question always. Give your answer in the form FINAL ANSWER: <answer>.\n"
         print(f"Category: {category}")
         print(f"Question: {prompt[:100]}...")
         
@@ -112,6 +120,20 @@ def benchmark_hle(num_samples=20, categories=None, offset=0):
             target_answer_phrase = sample.get('answer', '').strip()
 
             agent_final_response_content = get_last_assistant_content(history)
+
+            # Check if the response is empty
+            while "FINAL ANSWER" not in agent_final_response_content.upper():
+                sleep(5)
+                print("…no final verdict yet, asking the agent to continue")
+                resp, history = client.predict(
+                    # send just “continue” (or “please continue”)
+                    {"text": "Please finish the review and give the FINAL ANSWER line.", "files": []},
+                    history,            # include the full chat history
+                    api_name="/chat"
+                )
+                agent_final_response_content = get_last_assistant_content(history)
+                print(agent_final_response_content)
+                sleep(5)
 
             is_correct = False
 
@@ -170,8 +192,13 @@ def benchmark_hle(num_samples=20, categories=None, offset=0):
     return results
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Benchmark HLE dataset")
+    parser.add_argument("--offset", type=int, default=0, help="Offset for dataset samples")
+    args = parser.parse_args()
+
     benchmark_hle(
-        num_samples=20,
+        num_samples=1,
         categories=None,
-        offset=0,  # Adjust as needed for your dataset
+        offset=args.offset,
     )
