@@ -37,7 +37,7 @@ def compute_feedback(guess: str, solution: str) -> str:
 def sanitize_guess(raw: str) -> str:
     """Extract a 5-letter guess from any model output."""
     raw = raw.lower()
-    regex = r"{[\"\']guess[\"\']:\s*[\"\'](\w*)[\"\']}"
+    regex = r"{[\"\']guess[\"\']:\s*[\"\'](\w*)[\"\']"
     m = re.search(regex, raw)
     if m:
         return m.group(1)
@@ -125,6 +125,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "solved": guesses[-1][1] == "GGGGG" if guesses else False,
                 "turns": len(guesses),
                 "time": time.time() - start_time,
+                "conversation": _history
             }
         )
         # write entire results to file
