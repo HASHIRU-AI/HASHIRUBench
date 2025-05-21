@@ -51,10 +51,10 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
 
     for gi in range(num_games):
         client = Client("http://127.0.0.1:7860/hashiru/")
-        client.predict(
-            modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-            api_name="/update_model"
-        )
+        # client.predict(
+        #     modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+        #     api_name="/update_model"
+        # )
         client.reset_session()
         solution = random.choice(WORD_LIST)
         print(f"Game {gi+1}/{num_games}, solution: {solution}")
@@ -63,12 +63,12 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
 
         prompt = (
                 "We are playing a game of Wordle. The solution is a 5-letter word.\n"
-                "You will be given a guess and feedback in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist).\n"
+                f"Your task is to guess the solution word within {max_guesses} attempts.\n"
+                "You will be given feedback in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist in the word).\n"
                 "Your task is to guess the solution word.\n"
                 "Use agents and tools as nessesary to guess the word.\n"
-                "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
+                "From now on, the final response should be in this format: \{\"guess\":\"<WORD>\"\}.\n"
                 "I have selected the word, now start guessing!\n"
-                "Your first guess is:\n"
             )
         letters_not_in_word = set()
 
@@ -83,6 +83,8 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 _history,
                 api_name="/chat",
             )
+            print("response:", repr(response))
+            print("history:", repr(_history[-1]))
             guess = sanitize_guess(_history[-1].get("content", ""))
             if not guess:
                 print("Warning: empty guess; retrying without using a turn.")
@@ -132,12 +134,12 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
         # write entire results to file
         with open(out_path, "w") as f:
             f.write(json.dumps(results, indent=2) + "\n")
-        # set D:\Projects\AI\HASHIRU\src\models\models.json to {}
-        with open("D:\\Projects\\AI\\HASHIRU\\src\\models\\models.json", "w") as f:
-            f.write("{}")
-        # set D:\Projects\AI\HASHIRU\src\data\memory.json to []
-        with open("D:\\Projects\\AI\\HASHIRU\\src\\data\\memory.json", "w") as f:
-            f.write("[]")
+        # # set D:\Projects\AI\HASHIRU\src\models\models.json to {}
+        # with open("D:\\Projects\\AI\\HASHIRU\\src\\models\\models.json", "w") as f:
+        #     f.write("{}")
+        # # set D:\Projects\AI\HASHIRU\src\data\memory.json to []
+        # with open("D:\\Projects\\AI\\HASHIRU\\src\\data\\memory.json", "w") as f:
+        #     f.write("[]")
 
     print(f"Benchmark complete, results saved to {out_path}")
     return results
