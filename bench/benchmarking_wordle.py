@@ -37,7 +37,7 @@ def compute_feedback(guess: str, solution: str) -> str:
 def sanitize_guess(raw: str) -> str:
     """Extract a 5-letter guess from any model output."""
     raw = raw.lower()
-    regex = r"{\"guess\":\s*\"(\w*)\"}"
+    regex = r"{[\"\']guess[\"\']:\s*[\"\'](\w*)[\"\']"
     m = re.search(regex, raw)
     if m:
         return m.group(1)
@@ -51,10 +51,11 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
 
     for gi in range(num_games):
         client = Client("http://127.0.0.1:7860/hashiru/")
-        client.predict(
-            modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-            api_name="/update_model"
-        )
+        # client.predict(
+        #     modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+        #     api_name="/update_model"
+        # )
+        client.reset_session()
         solution = random.choice(WORD_LIST)
         print(f"Game {gi+1}/{num_games}, solution: {solution}")
         guesses, attempts = [], 0
@@ -62,33 +63,60 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
 
         prompt = (
                 "We are playing a game of Wordle. The solution is a 5-letter word.\n"
-                "You will be given a guess and feedback in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist).\n"
+                f"Your task is to guess the solution word within {max_guesses} attempts.\n"
+                "You will be given feedback in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist in the word).\n"
                 "Your task is to guess the solution word.\n"
+                "Use agents and tools as nessesary to guess the word.\n"
+                "From now on, the final response should be in this format: \{\"guess\":\"<WORD>\"\}.\n"
                 "I have selected the word, now start guessing!\n"
-                "From now on, only respond with the guess, format the guess as \{\"guess\":\"<WORD>\"\}.\n"
             )
+        letters_not_in_word = set()
 
+        response = ""
+        _history = []
+        
         while attempts < max_guesses:
-            job = client.submit(
-                message={"text": prompt.strip(), "files": []},
+            print(f"Attempt {attempts + 1}/{max_guesses}")
+            print("prompt:", repr(prompt))
+            response, _history = client.predict(
+                {"text": prompt.strip()},
+                _history,
                 api_name="/chat",
             )
-            while not job.done():
-                time.sleep(0.1)
-            response, _history = job.outputs()[-1]
-            print("⇢ model said:", repr(_history))
+            print("response:", repr(response))
+            print("history:", repr(_history[-1]))
             guess = sanitize_guess(_history[-1].get("content", ""))
-            if not guess or (len(guess) != 5 or guess not in WORD_LIST):
-                print(f"Warning: '{guess}' invalid; retrying without using a turn.")
-                prompt = "The guess is not 5 letters, not in the word list, or doesn't follow the schema. Please try again.\n"
+            if not guess:
+                print("Warning: empty guess; retrying without using a turn.")
+                prompt = "The guess is empty. This could be due to timeout or output not matching the expected format (\{\"guess\":\"<WORD>\"\}). Please try again.\n"
                 time.sleep(60)
+                continue
+            if len(guess) != 5:
+                print(f"guess: {guess} not 5 letters")
+                prompt = "The guess is not 5 letters. Please try again.\n"
+                time.sleep(5)
+                continue
+            if guess not in WORD_LIST:
+                print(f"guess: {guess} not in word list")
+                prompt = "The guess is not in the word list. Please try again.\n"
+                time.sleep(5)
                 continue
             print(f"Initial guess: {guess}")
             feedback = compute_feedback(guess, solution)
+            for i in range(5):
+                letter = feedback[i]
+                if letter == "X":
+                    letters_not_in_word.add(guess[i])
             print(f"Feedback: {feedback}")
-            prompt = f"Guess: {guess}, Feedback: {feedback}\n"
             guesses.append((guess, feedback))
             attempts += 1
+            prompt = {
+                "guess": guess,
+                "feedback": feedback,
+                "letters_not_in_word": letters_not_in_word,
+                "attempts": f"{attempts}/{max_guesses}",
+            }
+            prompt = str(prompt)
             print(f"Attempt {attempts}: {guess} -> {feedback}")
             if feedback == "GGGGG":
                 break
@@ -100,14 +128,21 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "solved": guesses[-1][1] == "GGGGG" if guesses else False,
                 "turns": len(guesses),
                 "time": time.time() - start_time,
+                "conversation": _history
             }
         )
         # write entire results to file
         with open(out_path, "w") as f:
             f.write(json.dumps(results, indent=2) + "\n")
+        # # set D:\Projects\AI\HASHIRU\src\models\models.json to {}
+        # with open("D:\\Projects\\AI\\HASHIRU\\src\\models\\models.json", "w") as f:
+        #     f.write("{}")
+        # # set D:\Projects\AI\HASHIRU\src\data\memory.json to []
+        # with open("D:\\Projects\\AI\\HASHIRU\\src\\data\\memory.json", "w") as f:
+        #     f.write("[]")
 
     print(f"Benchmark complete, results saved to {out_path}")
     return results
 
 if __name__ == "__main__":
-    print(benchmark_wordle(num_games=10, max_guesses=15))
+    print(benchmark_wordle(num_games=1000, max_guesses=6))

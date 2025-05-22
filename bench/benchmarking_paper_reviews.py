@@ -79,6 +79,9 @@ def benchmark_paper_reviews(
                 "GIVE A FINAL DECISION in the form of \"FINAL DECISION: <Accept/Reject>\". " \
                 "The paper title is: " + title + "\n\n" + row[text_col]
         print(f"[{idx+1}/{len(df)}] Paper ID: {paper_id}")
+        print(f"Title: {title}")
+        print(f"Prompt: {prompt[:200]}...")
+        print("→ Asking the agent to review the paper...")
 
         try:
             start = time.time()
@@ -128,9 +131,20 @@ def benchmark_paper_reviews(
     return results
 
 if __name__ == "__main__":
-    # example usage: adjust path & sample count as needed
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run paper-review benchmark.")
+    parser.add_argument(
+        "--offset", "-o",
+        type=int,
+        default=0,
+        help="Zero-based row index to start from (default: 0)."
+    )
+    args = parser.parse_args()
+
     benchmark_paper_reviews(
         csv_path="bench/data/ICLR_2023.csv",
-        num_samples=1,
-        offset=7,
+        num_samples=1,          # leave sampling off
+        offset=args.offset,
+        output_dir="results"
     )
