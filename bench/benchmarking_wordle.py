@@ -84,7 +84,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 api_name="/chat",
             )
             print("response:", repr(response))
-            print("history:", repr(_history[-1]))
+            print("history:", repr(_history))
             guess = sanitize_guess(_history[-1].get("content", ""))
             if not guess:
                 print("Warning: empty guess; retrying without using a turn.")
