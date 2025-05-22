@@ -34,6 +34,7 @@ def benchmark_arc(df, out_dir= "ai2_arc_results", num_questions=10):
     )
     correct_resp = 0
     for i, row in all_questions.iterrows():
+        start = time.time()
         question_number = i
         question = row.question
         choices = row.choices
@@ -58,16 +59,19 @@ def benchmark_arc(df, out_dir= "ai2_arc_results", num_questions=10):
                 break
             else:
                 prompt = "The response does not follow the format \{\"choice\":\"<OPTION>\"\}. Please try to answer the question with the correct requested format"
-                time.sleep(60)
+                print("invalid response retrying")
+                time.sleep(10)
                 continue
-                
+        elapsed = time.time() - start
+        time.sleep(50)
         result = {
             "question_num": question_number,
             "question": question,
-            "history": _history,
+            # "history": _history,
             "choices": {'text': choices['text'].tolist(), 'label': choices['label'].tolist()},
             "answerKey": answerKey,
-            "agent_resp": agent_resp
+            "agent_resp": agent_resp,
+            "time_elapsed": elapsed
         }
         if answerKey == agent_resp:
             correct_resp +=1
@@ -80,4 +84,4 @@ if __name__ == "__main__":
 
     splits = {'train': 'ARC-Challenge/train-00000-of-00001.parquet', 'test': 'ARC-Challenge/test-00000-of-00001.parquet', 'validation': 'ARC-Challenge/validation-00000-of-00001.parquet'}
     df = pd.read_parquet("hf://datasets/allenai/ai2_arc/" + splits["validation"])
-    benchmark_arc(df=df, num_questions=10)
+    benchmark_arc(df=df, num_questions=30)
