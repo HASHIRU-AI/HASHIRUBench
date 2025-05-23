@@ -129,6 +129,7 @@ The system uses a two-tiered hierarchy:
             \item Resource Consumption: Associated costs (API, hardware utilization) tracked by system.
         \end{itemize}
         Specialized employee agents are constructed using base models such as Mistral~7B~\cite{jiang2023mistral}, Llama~3~\cite{llama3herd}, Gemini~1.5~\cite{gemini1.5_report}, Qwen2.5~\cite{qwen2.5_report}, Qwen3~\cite{qwen3_blog}, and DeepSeek-R1~\cite{deepseekr1_report}, with the CEO agent configuring them via tailored system prompts.
+        The models will be run locally using Ollama~\cite{ollama}, and via API calls to external models such as Gemini 2.5 Flash~\cite{gemini25flash} and other models hosted on Hugging Face~\cite{huggingface2025}, Groq~\cite{groq2025}, Lambda.ai~\cite{lambda2025}, and other platforms.
 \end{itemize}
 This hierarchy facilitates task decomposition and result aggregation; the dynamic pool provides flexibility.
 
@@ -221,6 +222,7 @@ Tasks demand complex reasoning, multi-perspective analysis, and interaction, sui
 
 \subsubsection{Academic Paper Review}
 Evaluates HASHIRU's critical assessment by simulating peer review. Given papers (e.g., PDF), the system generates a review summary and recommends acceptance/rejection. Probes ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
+We use a dataset of 50 papers from ICLR 2023 with a prompt eliciting multiple reviews. The prompt is: ``Create THREE agents with relevant personalities, expertise, and review styles. Each agent should provide a review of the paper, and recommend Accept/Reject for ICLR 2023. The review should be detailed and include strengths and weaknesses. Finish the entire review and DO NOT STOP in the middle. GIVE A FINAL DECISION in the form of "FINAL DECISION: <Accept/Reject>". The paper title is: <paper title> <paper text>''
 
 \subsubsection{Reasoning and Problem-Solving Tasks}
 Evaluates broader reasoning, knowledge retrieval, and problem-solving under constraints using challenging benchmarks and puzzles:
@@ -261,6 +263,11 @@ We evaluate using quantitative and qualitative metrics:
             \item Number and utility of autonomously created tools (if applicable).
         \end{itemize}
 \end{itemize}
+
+
+\section*{Acknowledgments}
+
+This research was supported by Hugging Face, Lambda Labs, and Groq. We also thank Prof. Lifu Huang for providing the dataset for the academic paper review task.
 
 \bibliography{references}
 \bibliographystyle{plain}
