@@ -59,6 +59,10 @@ def benchmark_hle(num_samples=20, categories=None, offset=0):
     
     # Initialize client
     client = Client("http://127.0.0.1:7860/")
+    client.predict(
+		modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+		api_name="/update_model"
+    )
     
     # Create results directory if it doesn't exist
     os.makedirs("results", exist_ok=True)
