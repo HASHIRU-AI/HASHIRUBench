@@ -236,10 +236,10 @@ We designed experiments to evaluate HASHIRU's performance, efficiency, and adapt
 
 \subsection{Evaluation Tasks}
 \label{subsec:tasks}
-Tasks demand complex reasoning, multi-perspective analysis, and interaction, suitable for HASHIRU's coordination and dynamic capabilities. Tasks fall into two categories:
+HASHIRU's coordination and dynamic capabilities are specifically designed for tasks demanding complex reasoning, multi-perspective analysis, and interactive engagement, all while upholding rigorous safety standards. We selected a diverse set of tasks to evaluate these capabilities, including:
 
 \subsubsection{Academic Paper Review}
-This task evaluates HASHIRU's critical assessment by simulating peer review. Given papers (e.g., PDF), the system generates a review summary and recommends acceptance/rejection. Probes ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
+This task evaluates HASHIRU's critical assessment by simulating peer review. Given a paper's text, the system generates a review summary and recommends acceptance/rejection. This task probes the ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
 We use a dataset of 50 papers from ICLR 2023 with a prompt eliciting multiple reviews. The prompt is: ``Create THREE agents with relevant personalities, expertise, and review styles. Each agent should provide a review of the paper, and recommend Accept/Reject for ICLR 2023. The review should be detailed and include strengths and weaknesses. Finish the entire review and DO NOT STOP in the middle. GIVE A FINAL DECISION in the form of ``FINAL DECISION: $<$Accept/Reject$>$''. The paper title is: $<$paper title$>$ $<$paper text$>$''.
 
 \subsubsection{Reasoning and Problem-Solving Tasks}
@@ -251,6 +251,9 @@ This task evaluates broader reasoning, knowledge retrieval, and problem-solving 
     \item \textbf{Globle:} Geographic deduction game identifying a target country based on proximity feedback. Tests geographic knowledge, spatial reasoning, iterative strategy based on feedback. Assumes simulated game environment.
 \end{itemize}
 These tasks challenge the system's ability to leverage appropriate resources (local vs. external), potentially create simple tools, and coordinate problem-solving.
+
+\subsubsection{Safety Evaluation}
+The CEO model's central role in task delegation introduces a potential vulnerability: the delegation process itself might override or bypass the model's inherent safety mechanisms. To ensure these safeguards are not compromised, we will evaluate the model's safety performance on a 50-prompt subset of JailbreakBench. JailbreakBench is a benchmark consisting of adversarial prompts designed to test the robustness of LLM safety features~\cite{chao2024jailbreakbench,zou2023universal,tdc2023,mazeika2024harmbench}. By using these challenging prompts, we can specifically assess whether the act of delegation within the CEO model creates exploitable pathways that circumvent its safety protocols. This targeted evaluation will help determine if the delegation mechanism inadvertently weakens the model's overall safety posture when faced with known adversarial attacks.
 
 \subsection{Baselines for Comparison}
 \label{subsec:baselines}
