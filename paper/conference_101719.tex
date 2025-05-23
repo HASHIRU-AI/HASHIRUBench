@@ -11,6 +11,7 @@
 \usepackage{longtable}
 \usepackage{tabularx}
 \usepackage{tcolorbox}
+\usepackage{array}
 \tcbuselibrary{skins}
 
 % Define styles for user and assistant boxes
@@ -195,7 +196,7 @@ Memory retrieval is based on semantic similarity between the current context (e.
 
 \section{Case Studies}
 \label{sec:casestudies}
-This section presents two case studies demonstrating HASHIRU's self-improvement capabilities in practical settings. We highlight two instances where HASHIRU enhanced its own architecture and functionality: (1) by generating a comprehensive cost model for base models suitable for specialized agent creation, and (2) by autonomously integrating new tools for the CEO agent.
+This section presents three case studies demonstrating HASHIRU's self-improvement capabilities in practical settings. We highlight three instances where HASHIRU enhanced its own architecture and functionality: (1) by generating a comprehensive cost model for base models suitable for specialized agent creation, (2) by autonomously integrating new tools for the CEO agent, and (3) by implementing a self-regulating budget management system.
 
 \subsection{Case Study 1: Self-Generating the Cost Model for Agent Specialization}
 \label{sec:casestudy1_costmodel}
@@ -238,11 +239,11 @@ We designed experiments to evaluate HASHIRU's performance, efficiency, and adapt
 Tasks demand complex reasoning, multi-perspective analysis, and interaction, suitable for HASHIRU's coordination and dynamic capabilities. Tasks fall into two categories:
 
 \subsubsection{Academic Paper Review}
-Evaluates HASHIRU's critical assessment by simulating peer review. Given papers (e.g., PDF), the system generates a review summary and recommends acceptance/rejection. Probes ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
+This task evaluates HASHIRU's critical assessment by simulating peer review. Given papers (e.g., PDF), the system generates a review summary and recommends acceptance/rejection. Probes ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
 We use a dataset of 50 papers from ICLR 2023 with a prompt eliciting multiple reviews. The prompt is: ``Create THREE agents with relevant personalities, expertise, and review styles. Each agent should provide a review of the paper, and recommend Accept/Reject for ICLR 2023. The review should be detailed and include strengths and weaknesses. Finish the entire review and DO NOT STOP in the middle. GIVE A FINAL DECISION in the form of ``FINAL DECISION: $<$Accept/Reject$>$''. The paper title is: $<$paper title$>$ $<$paper text$>$''.
 
 \subsubsection{Reasoning and Problem-Solving Tasks}
-Evaluates broader reasoning, knowledge retrieval, and problem-solving under constraints using challenging benchmarks and puzzles:
+This task evaluates broader reasoning, knowledge retrieval, and problem-solving under constraints using challenging benchmarks and puzzles:
 \begin{itemize}
     \item \textbf{Humanity's Last Exam \cite{phan2025humanitysexam}:} Tests graduate-level technical knowledge and complex reasoning across domains. Requires deep understanding and sophisticated problem-solving, likely needing powerful external LLMs managed within HASHIRU's hybrid framework.
     \item \textbf{NYT Connections \cite{lopez2024nyt}:} Puzzle requiring identifying hidden semantic relationships/themes to categorize 16 words into four groups. Involves associative reasoning, broad knowledge, and hypothesis testing, testing knowledge access and combinatorial reasoning coordination.
@@ -257,6 +258,9 @@ To quantify HASHIRU's benefits, we compare its performance against the baseline 
 We chose Gemini 2.0 Flash as the baseline due to our architecture's efficacy being tied to augmenting the capabilities of a single agent. This choice allows us to isolate the impact of our dynamic management and hybrid intelligence features, providing a clear comparison point.
 We also compare against the token cost of a powerful reasoning model, i.e., Gemini 2.5 Flash~\cite{gemini25flash}, to assess the cost-effectiveness of our approach.
 If our architecture is effective, we expect to see higher accuracy compared to the baseline, while also being more cost-effective than using a single powerful model. This will demonstrate the advantages of our hybrid approach in practical applications.
+
+For paper reviews, we just evaluate HASHIRU's accuracy in predication of decisions of acceptance with the ground truth. Since the task is, by design, involving multiple agents, it is not possible to replicate autonomously with a single agent.
+While we could invoke three Gemini 2.0 Flash agents, it would not be a fair comparison, as the ``personalities'' and ``expertise'' of the agents would have to be manually specified, which is not the case in HASHIRU.
 
 \subsection{Evaluation Metrics}
 \label{subsec:metrics}
@@ -280,6 +284,28 @@ We evaluate using quantitative and qualitative metrics:
             \item Number and utility of autonomously created tools (if applicable).
         \end{itemize}
 \end{itemize}
+
+\section{Results and Discussion}
+\label{sec:results}
+We present preliminary results from our experiments, focusing on the academic paper review task and the reasoning tasks. The results are summarized in Table \ref{tab:results}.
+
+\begin{table}[h]
+    \centering
+    \caption{Summary of Experimental Results}
+    \label{tab:results}
+    \begin{tabular}{|>{\centering\arraybackslash}p{1cm}|
+                    >{\centering\arraybackslash}p{1.2cm}|
+                    >{\centering\arraybackslash}p{1cm}|
+                    >{\centering\arraybackslash}p{1cm}|
+                    >{\centering\arraybackslash}p{2cm}|}
+        \hline
+        \textbf{Task} & \textbf{HASHIRU SR} & \textbf{Base SR} & \textbf{Avg. Time} & \textbf{Resource Use} \\
+        \hline
+        Paper Review & 58\% & N/A & $\approx$100s & Low (3 Gemini 1.5 models) \\
+        \hline
+    \end{tabular}
+\end{table}
+
 
 
 \section*{Acknowledgments}
