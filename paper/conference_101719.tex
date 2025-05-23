@@ -181,8 +181,8 @@ A distinctive feature is \textbf{integrated, autonomous tool creation}. If the C
     \item Defining tool specification (inputs, outputs, functionality).
     \item Commissioning logic generation (code, potentially using external APIs with provided credentials, possibly via a code-generating agent).
     \item Deploying logic as a new, callable API endpoint within HASHIRU.
-    \item Potentially instantiating an Employee agent for the new tool.
 \end{enumerate}
+To achieve this autonomous creation, HASHIRU employs a few-shot prompting approach, analyzing existing tools within its system to learn how to specify and implement new ones \cite{brown2020language}.
 This allows HASHIRU to dynamically extend its functional repertoire, tailoring capabilities to tasks without manual intervention, enabling greater autonomy and adaptation.
 
 \subsection{Memory Function: Learning from Experience}
@@ -202,8 +202,8 @@ An accurate cost model is essential for optimizing resource allocation and ensur
 
 \subsection{Case Study 2: Autonomous Tool Integration for the CEO Agent}
 \label{sec:casestudy2_tools}
-Extending the CEO agent's capabilities through tool integration is vital for broadening HASHIRU's operational scope. Manual tool development typically requires detailed analysis of existing tool schemas and diligent code implementation. HASHIRU streamlined this process by employing a few-shot learning approach, using an existing tool as a template to guide the autonomous creation of new tools~\cite{brown2020language}. The newly generated tools were directly integrated into the codebase\footnote{\url{https://github.com/kunpai/HASHIRU/commit/193e10b2b00917256b7cc01cb3aa5ac7b6a6c174}}.
-
+Extending the CEO agent's capabilities through tool integration is vital for broadening HASHIRU's operational scope. Manual tool development typically requires detailed analysis of existing tool schemas and diligent code implementation. HASHIRU streamlined this process by employing a few-shot learning approach, using an existing tool as a template to guide the autonomous creation of new tools~\cite{brown2020language}, iteratively refining the code in case of bugs as well. The newly generated tools were directly integrated into the codebase\footnote{\url{https://github.com/kunpai/HASHIRU/commit/193e10b2b00917256b7cc01cb3aa5ac7b6a6c174}}\footnote{\url{https://github.com/HASHIRU-AI/HASHIRU/blob/main/src/tools/default_tools/get_website_tool.py}}. This approach not only reduced the time and effort required for tool development but also enhanced the system's adaptability by allowing it to autonomously create and integrate new tools as needed.
+This approach significantly reduces development overhead and enhances adaptability, enabling the system to dynamically expand its capabilities with minimal human intervention.
 
 \section{Experimental Setup}
 \label{sec:experiments}
@@ -247,13 +247,10 @@ We evaluate using quantitative and qualitative metrics:
         \begin{itemize}
             \item Percentage of tasks completed (binary for games, graded for analysis).
             \item Output quality for analysis (human evaluation: relevance, coherence, accuracy, completeness).
-            \item Accuracy for information extraction.
-            \item Guesses/turns for game tasks.
         \end{itemize}
     \item \textbf{Resource Consumption:}
         \begin{itemize}
             \item Total external API costs.
-            \item Peak and average memory usage (\% of allocated budget).
             \item Wall-clock time per task.
             \item Number and type (local/external) of LLM calls.
         \end{itemize}
