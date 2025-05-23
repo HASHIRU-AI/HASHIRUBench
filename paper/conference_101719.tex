@@ -206,6 +206,23 @@ An accurate cost model is essential for optimizing resource allocation and ensur
 Extending the CEO agent's capabilities through tool integration is vital for broadening HASHIRU's operational scope. Manual tool development typically requires detailed analysis of existing tool schemas and diligent code implementation. HASHIRU streamlined this process by employing a few-shot learning approach, using an existing tool as a template to guide the autonomous creation of new tools~\cite{brown2020language}, iteratively refining the code in case of bugs as well. The newly generated tools were directly integrated into the codebase\footnote{\url{https://github.com/kunpai/HASHIRU/commit/193e10b2b00917256b7cc01cb3aa5ac7b6a6c174}}\footnote{\url{https://github.com/HASHIRU-AI/HASHIRU/blob/main/src/tools/default_tools/get_website_tool.py}}. This approach not only reduced the time and effort required for tool development but also enhanced the system's adaptability by allowing it to autonomously create and integrate new tools as needed.
 This approach significantly reduces development overhead and enhances adaptability, enabling the system to dynamically expand its capabilities with minimal human intervention.
 
+\subsection{Case Study 3: Autonomous Budget Management}
+\label{sec:casestudy3_budget}
+Overshooting the budget is a common issue in many modern AI systems, particularly when deploying large language models (LLMs) via APIs with token-based billing.
+In practice, this can lead to sudden and unexpected cost spikes due to prompt amplification, model chaining, or misuse—sometimes resulting in hundreds of dollars in charges within minutes~\cite{gemini_reddit,openai_sos,openai_costs}.
+HASHIRU addresses this by implementing a self-regulating mechanism that autonomously monitors its budget allocation.
+The system continuously tracks its spending against predefined budget limits, ensuring that it operates within the allocated financial constraints.
+This proactive approach not only prevents overspending but also optimizes resource utilization, allowing HASHIRU to maintain efficiency and cost-effectiveness in its operations.
+Figure \ref{fig:budget_management} illustrates how HASHIRU refuses to use an external API when the budget is exceeded.
+
+% insert figure here
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{budget2.png}
+    \caption{HASHIRU's autonomous budget management system, ensuring efficient resource utilization and preventing overspending.}
+    \label{fig:budget_management}
+\end{figure}
+
 \section{Experimental Setup}
 \label{sec:experiments}
 
@@ -222,7 +239,7 @@ Tasks demand complex reasoning, multi-perspective analysis, and interaction, sui
 
 \subsubsection{Academic Paper Review}
 Evaluates HASHIRU's critical assessment by simulating peer review. Given papers (e.g., PDF), the system generates a review summary and recommends acceptance/rejection. Probes ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
-We use a dataset of 50 papers from ICLR 2023 with a prompt eliciting multiple reviews. The prompt is: ``Create THREE agents with relevant personalities, expertise, and review styles. Each agent should provide a review of the paper, and recommend Accept/Reject for ICLR 2023. The review should be detailed and include strengths and weaknesses. Finish the entire review and DO NOT STOP in the middle. GIVE A FINAL DECISION in the form of "FINAL DECISION: <Accept/Reject>". The paper title is: <paper title> <paper text>''
+We use a dataset of 50 papers from ICLR 2023 with a prompt eliciting multiple reviews. The prompt is: ``Create THREE agents with relevant personalities, expertise, and review styles. Each agent should provide a review of the paper, and recommend Accept/Reject for ICLR 2023. The review should be detailed and include strengths and weaknesses. Finish the entire review and DO NOT STOP in the middle. GIVE A FINAL DECISION in the form of ``FINAL DECISION: $<$Accept/Reject$>$''. The paper title is: $<$paper title$>$ $<$paper text$>$''.
 
 \subsubsection{Reasoning and Problem-Solving Tasks}
 Evaluates broader reasoning, knowledge retrieval, and problem-solving under constraints using challenging benchmarks and puzzles:
