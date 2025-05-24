@@ -250,6 +250,8 @@ This task evaluates broader reasoning, knowledge retrieval, and problem-solving 
     \item \textbf{NYT Connections \cite{lopez2024nyt}:} Puzzle requiring identifying hidden semantic relationships/themes to categorize 16 words into four groups. Involves associative reasoning, broad knowledge, and hypothesis testing, testing knowledge access and combinatorial reasoning coordination.
     \item \textbf{Wordle:} Daily word puzzle requiring deductive reasoning to identify a five-letter word within six guesses, using feedback. Tests logical deduction, constraint satisfaction, vocabulary. Good test for comparing efficiency (speed, cost, guesses) of local vs. external models for iterative reasoning. Assumes simulated game environment.
     \item \textbf{Globle:} Geographic deduction game identifying a target country based on proximity feedback. Tests geographic knowledge, spatial reasoning, iterative strategy based on feedback. Assumes simulated game environment.
+    \item \textbf{ARC (AI2 Reasoning Challenge)\cite{boratko2018systematic}:} A benchmark featuring challenging multiple-choice science questions designed to test complex reasoning. Successfully answering these questions requires capabilities such as knowledge retrieval, logical inference, and multi-step problem-solving.
+    We use a mixed set of 100 questions from the ARC Challenge, which includes both easy and hard questions.
 \end{itemize}
 These tasks challenge the system's ability to leverage appropriate resources (local vs. external), potentially create simple tools, and coordinate problem-solving.
 
@@ -296,22 +298,23 @@ We evaluate using quantitative and qualitative metrics:
 \label{sec:results}
 We present preliminary results from our experiments, focusing on the academic paper review task and the reasoning tasks. The results are summarized in Table \ref{tab:results}.
 
-\begin{table}[htbp] % Use [htbp] for better float placement
+\begin{table}[htbp]
     \centering
     \caption{Summary of Experimental Results. SR denotes Success Rate.}
-    \label{tab:results} % Changed label to avoid conflict if you keep the old one
+    \label{tab:results}
     \begin{tabular}{
-                    >{\raggedright\arraybackslash}p{2cm} % Task column, left-aligned for readability
-                    >{\centering\arraybackslash}p{1cm} % HASHIRU SR, centered
-                    >{\centering\arraybackslash}p{1cm} % Baseline SR, centered
-                    >{\centering\arraybackslash}p{1cm} % Avg. Time, centered
-                    >{\raggedright\arraybackslash}p{2cm}   % Resource Use, left-aligned
+                    >{\raggedright\arraybackslash}p{2cm}
+                    >{\centering\arraybackslash}p{1cm}
+                    >{\centering\arraybackslash}p{1cm}
+                    >{\centering\arraybackslash}p{1cm}
+                    >{\raggedright\arraybackslash}p{2cm}
                     }
         \toprule
         \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
         \midrule
-        Paper Review    & 58   & N/A & $\approx$100 & Low (3 Gemini 1.5 models) \\
-        JailbreakBench  & 100  & N/A & $\approx$1   & Low (1 Gemini 2.0 model) \\
+        Paper Review    & 58   & N/A & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
+        JailbreakBench  & 100  & N/A & $\approx$1   & Negligible (CEO model) \\
+        AI2 Reasoning Challenge & 96   & 95  & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
         \bottomrule
     \end{tabular}
 \end{table}
