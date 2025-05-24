@@ -12,6 +12,7 @@
 \usepackage{tabularx}
 \usepackage{tcolorbox}
 \usepackage{array}
+\usepackage{booktabs}
 \tcbuselibrary{skins}
 
 % Define styles for user and assistant boxes
@@ -295,21 +296,23 @@ We evaluate using quantitative and qualitative metrics:
 \label{sec:results}
 We present preliminary results from our experiments, focusing on the academic paper review task and the reasoning tasks. The results are summarized in Table \ref{tab:results}.
 
-\begin{table}[h]
+\begin{table}[htbp] % Use [htbp] for better float placement
     \centering
-    \caption{Summary of Experimental Results}
-    \label{tab:results}
-    \begin{tabular}{|>{\centering\arraybackslash}p{1cm}|
-                    >{\centering\arraybackslash}p{1.2cm}|
-                    >{\centering\arraybackslash}p{1cm}|
-                    >{\centering\arraybackslash}p{1cm}|
-                    >{\centering\arraybackslash}p{2cm}|}
-        \hline
-        \textbf{Task} & \textbf{HASHIRU SR} & \textbf{Base SR} & \textbf{Avg. Time} & \textbf{Resource Use} \\
-        \hline
-        Paper Review & 58\% & N/A & $\approx$100s & Low (3 Gemini 1.5 models) \\
-        JailbreakBench & 100\% & N/A & $\approx$1s & Low (1 Gemini 2.0 model) \\
-        \hline
+    \caption{Summary of Experimental Results. SR denotes Success Rate.}
+    \label{tab:results} % Changed label to avoid conflict if you keep the old one
+    \begin{tabular}{
+                    >{\raggedright\arraybackslash}p{2cm} % Task column, left-aligned for readability
+                    >{\centering\arraybackslash}p{1cm} % HASHIRU SR, centered
+                    >{\centering\arraybackslash}p{1cm} % Baseline SR, centered
+                    >{\centering\arraybackslash}p{1cm} % Avg. Time, centered
+                    >{\raggedright\arraybackslash}p{2cm}   % Resource Use, left-aligned
+                    }
+        \toprule
+        \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
+        \midrule
+        Paper Review    & 58   & N/A & $\approx$100 & Low (3 Gemini 1.5 models) \\
+        JailbreakBench  & 100  & N/A & $\approx$1   & Low (1 Gemini 2.0 model) \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
