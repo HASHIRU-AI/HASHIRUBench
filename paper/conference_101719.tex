@@ -12,6 +12,7 @@
 \usepackage{tabularx}
 \usepackage{tcolorbox}
 \usepackage{array}
+\usepackage{booktabs}
 \tcbuselibrary{skins}
 
 % Define styles for user and assistant boxes
@@ -236,10 +237,10 @@ We designed experiments to evaluate HASHIRU's performance, efficiency, and adapt
 
 \subsection{Evaluation Tasks}
 \label{subsec:tasks}
-Tasks demand complex reasoning, multi-perspective analysis, and interaction, suitable for HASHIRU's coordination and dynamic capabilities. Tasks fall into two categories:
+HASHIRU's coordination and dynamic capabilities are specifically designed for tasks demanding complex reasoning, multi-perspective analysis, and interactive engagement, all while upholding rigorous safety standards. We selected a diverse set of tasks to evaluate these capabilities, including:
 
 \subsubsection{Academic Paper Review}
-This task evaluates HASHIRU's critical assessment by simulating peer review. Given papers (e.g., PDF), the system generates a review summary and recommends acceptance/rejection. Probes ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
+This task evaluates HASHIRU's critical assessment by simulating peer review. Given a paper's text, the system generates a review summary and recommends acceptance/rejection. This task probes the ability to decompose criteria, delegate to specialized agents (novelty, rigor, clarity), and manage resources across complex documents.
 We use a dataset of 50 papers from ICLR 2023 with a prompt eliciting multiple reviews. The prompt is: ``Create THREE agents with relevant personalities, expertise, and review styles. Each agent should provide a review of the paper, and recommend Accept/Reject for ICLR 2023. The review should be detailed and include strengths and weaknesses. Finish the entire review and DO NOT STOP in the middle. GIVE A FINAL DECISION in the form of ``FINAL DECISION: $<$Accept/Reject$>$''. The paper title is: $<$paper title$>$ $<$paper text$>$''.
 
 \subsubsection{Reasoning and Problem-Solving Tasks}
@@ -249,8 +250,13 @@ This task evaluates broader reasoning, knowledge retrieval, and problem-solving 
     \item \textbf{NYT Connections \cite{lopez2024nyt}:} Puzzle requiring identifying hidden semantic relationships/themes to categorize 16 words into four groups. Involves associative reasoning, broad knowledge, and hypothesis testing, testing knowledge access and combinatorial reasoning coordination.
     \item \textbf{Wordle:} Daily word puzzle requiring deductive reasoning to identify a five-letter word within six guesses, using feedback. Tests logical deduction, constraint satisfaction, vocabulary. Good test for comparing efficiency (speed, cost, guesses) of local vs. external models for iterative reasoning. Assumes simulated game environment.
     \item \textbf{Globle:} Geographic deduction game identifying a target country based on proximity feedback. Tests geographic knowledge, spatial reasoning, iterative strategy based on feedback. Assumes simulated game environment.
+    \item \textbf{ARC (AI2 Reasoning Challenge)\cite{boratko2018systematic}:} A benchmark featuring challenging multiple-choice science questions designed to test complex reasoning. Successfully answering these questions requires capabilities such as knowledge retrieval, logical inference, and multi-step problem-solving.
+    We use a mixed set of 100 questions from the ARC Challenge, which includes both easy and hard questions.
 \end{itemize}
 These tasks challenge the system's ability to leverage appropriate resources (local vs. external), potentially create simple tools, and coordinate problem-solving.
+
+\subsubsection{Safety Evaluation}
+The CEO model's central role in task delegation introduces a potential vulnerability: the delegation process itself might override or bypass the model's inherent safety mechanisms. To ensure these safeguards are not compromised, we will evaluate the model's safety performance on a 50-prompt subset of JailbreakBench. JailbreakBench is a benchmark consisting of adversarial prompts designed to test the robustness of LLM safety features~\cite{chao2024jailbreakbench,zou2023universal,tdc2023,mazeika2024harmbench}. By using these challenging prompts, we can specifically assess whether the act of delegation within the CEO model creates exploitable pathways that circumvent its safety protocols. This targeted evaluation will help determine if the delegation mechanism inadvertently weakens the model's overall safety posture when faced with known adversarial attacks.
 
 \subsection{Baselines for Comparison}
 \label{subsec:baselines}
@@ -261,6 +267,9 @@ If our architecture is effective, we expect to see higher accuracy compared to t
 
 For paper reviews, we just evaluate HASHIRU's accuracy in predication of decisions of acceptance with the ground truth. Since the task is, by design, involving multiple agents, it is not possible to replicate autonomously with a single agent.
 While we could invoke three Gemini 2.0 Flash agents, it would not be a fair comparison, as the ``personalities'' and ``expertise'' of the agents would have to be manually specified, which is not the case in HASHIRU.
+Similarly, for JailbreakBench, we assess the success rate (via human annotation) of HASHIRU's CEO agent in safely handling prompts without delegation.
+This step is vital to confirm that HASHIRU's integration and any system-level instructions provided to the CEO agent do not degrade its intrinsic safety capabilities.
+Consequently, a direct comparison to the base Gemini 2.0 Flash model is omitted, as the focus is on verifying the non-degradation of the CEO's safety, which stems from the same inherent mechanisms as the base model.
 
 \subsection{Evaluation Metrics}
 \label{subsec:metrics}
@@ -289,20 +298,24 @@ We evaluate using quantitative and qualitative metrics:
 \label{sec:results}
 We present preliminary results from our experiments, focusing on the academic paper review task and the reasoning tasks. The results are summarized in Table \ref{tab:results}.
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
-    \caption{Summary of Experimental Results}
+    \caption{Summary of Experimental Results. SR denotes Success Rate.}
     \label{tab:results}
-    \begin{tabular}{|>{\centering\arraybackslash}p{1cm}|
-                    >{\centering\arraybackslash}p{1.2cm}|
-                    >{\centering\arraybackslash}p{1cm}|
-                    >{\centering\arraybackslash}p{1cm}|
-                    >{\centering\arraybackslash}p{2cm}|}
-        \hline
-        \textbf{Task} & \textbf{HASHIRU SR} & \textbf{Base SR} & \textbf{Avg. Time} & \textbf{Resource Use} \\
-        \hline
-        Paper Review & 58\% & N/A & $\approx$100s & Low (3 Gemini 1.5 models) \\
-        \hline
+    \begin{tabular}{
+                    >{\raggedright\arraybackslash}p{2cm}
+                    >{\centering\arraybackslash}p{1cm}
+                    >{\centering\arraybackslash}p{1cm}
+                    >{\centering\arraybackslash}p{1cm}
+                    >{\raggedright\arraybackslash}p{2cm}
+                    }
+        \toprule
+        \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
+        \midrule
+        Paper Review    & 58   & N/A & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
+        JailbreakBench  & 100  & N/A & $\approx$1   & Negligible (CEO model) \\
+        AI2 Reasoning Challenge & 96   & 95  & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
