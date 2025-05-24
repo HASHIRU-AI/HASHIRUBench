@@ -264,6 +264,9 @@ If our architecture is effective, we expect to see higher accuracy compared to t
 
 For paper reviews, we just evaluate HASHIRU's accuracy in predication of decisions of acceptance with the ground truth. Since the task is, by design, involving multiple agents, it is not possible to replicate autonomously with a single agent.
 While we could invoke three Gemini 2.0 Flash agents, it would not be a fair comparison, as the ``personalities'' and ``expertise'' of the agents would have to be manually specified, which is not the case in HASHIRU.
+Similarly, for JailbreakBench, we assess the success rate (via human annotation) of HASHIRU's CEO agent in safely handling prompts without delegation.
+This step is vital to confirm that HASHIRU's integration and any system-level instructions provided to the CEO agent do not degrade its intrinsic safety capabilities.
+Consequently, a direct comparison to the base Gemini 2.0 Flash model is omitted, as the focus is on verifying the non-degradation of the CEO's safety, which stems from the same inherent mechanisms as the base model.
 
 \subsection{Evaluation Metrics}
 \label{subsec:metrics}
@@ -305,6 +308,7 @@ We present preliminary results from our experiments, focusing on the academic pa
         \textbf{Task} & \textbf{HASHIRU SR} & \textbf{Base SR} & \textbf{Avg. Time} & \textbf{Resource Use} \\
         \hline
         Paper Review & 58\% & N/A & $\approx$100s & Low (3 Gemini 1.5 models) \\
+        JailbreakBench & 100\% & N/A & $\approx$1s & Low (1 Gemini 2.0 model) \\
         \hline
     \end{tabular}
 \end{table}
