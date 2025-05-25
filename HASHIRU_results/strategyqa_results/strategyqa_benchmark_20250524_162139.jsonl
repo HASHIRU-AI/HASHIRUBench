@@ -1,0 +1,300 @@
+{
+  "question_num": 1,
+  "question": "Would a modern central processing unit circuit chip fit on a housekey?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 17.356770753860474,
+  "facts": "A CPU circuit chip is about an inch across. A housekey is generally less than a half-inch across.",
+  "retry_count": 0
+}
+{
+  "question_num": 2,
+  "question": "Did Pablo Escobar's nickname collection outshine Robert Moses Grove's?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.407019853591919,
+  "facts": "Robert Moses Grove was a baseball player nicknamed Lefty Grove. Pablo Escobar had several nicknames including: Don Pablo, El Padrino, and El Patr\u00f3n.",
+  "retry_count": 0
+}
+{
+  "question_num": 3,
+  "question": "Can someone in Uberlandia work for Mitsubishi?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 1.8059496879577637,
+  "facts": "Mitsubishi is a Japanese auto manufacturer Mitsubishi operates a plant in Catalao, Brazil Uberlandia is just under 70 miles from Catalao",
+  "retry_count": 0
+}
+{
+  "question_num": 4,
+  "question": "Is Europa linked to Viennese waltzes?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.2068207263946533,
+  "facts": "Europa is a moon of Jupiter Europa played an important role in Stanley Kubrick's film 2001: A Space Odyssey The soundtrack to 2001: A Space Odyssey prominently featured The Blue Danube The Blue Danube is a famous Viennese waltz composed by Johan Strauss II",
+  "retry_count": 0
+}
+{
+  "question_num": 5,
+  "question": "Did Eiffel Tower contribute to a war victory?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 1.705939531326294,
+  "facts": "A radio transmitter located in the Eiffel Tower. This transmitter jammed German radio communications. This hindrance in German radio communications contributing to the Allied victory at the First Battle of the Marne.",
+  "retry_count": 0
+}
+{
+  "question_num": 6,
+  "question": "Would a crocodile survive longer in Great Salt Lake than alligator?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 1.8055763244628906,
+  "facts": "The Great Salt Lake is a Utah lake composed of salt water. Crocodiles natural habitat is salt water and they can breathe underwater for hours. Alligators have a natural habitat of fresh water.",
+  "retry_count": 0
+}
+{
+  "question_num": 7,
+  "question": "Are any minor league baseball teams named after felines?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 7.5091392993927,
+  "facts": "Felines include cats, tigers, and lions. The Sacramento River Cats are a minor league baseball affiliate of the San Francisco Giants. The Tri-City Valley Cats are a minor league baseball affiliate of the Houston Astros. The Lakeland Flying Tigers are a minor league baseball affiliate of the Detroit Tigers.",
+  "retry_count": 1
+}
+{
+  "question_num": 8,
+  "question": "Do you need to worry about Zika virus in Antarctica? ",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 1.8058981895446777,
+  "facts": "Mosquitoes cannot survive in the climate of Antarctica. Zika virus is primarily spread through mosquito bites. ",
+  "retry_count": 0
+}
+{
+  "question_num": 9,
+  "question": "Could Saint Peter watch television?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 1.7054557800292969,
+  "facts": "Saint Peter died in 64 BC. The television was invented in 1900.",
+  "retry_count": 0
+}
+{
+  "question_num": 10,
+  "question": "Is Atlantic cod found in a vegemite sandwich?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 1.9057588577270508,
+  "facts": "Vegemite is a spread popular in Australia. Vegemite is made from leftover brewers' yeast extract with various vegetable and spice additives.  The Atlantic cod is found mostly in North America and Greenland.",
+  "retry_count": 0
+}
+{
+  "question_num": 11,
+  "question": "Would a vegan eat a traditional Paella dish?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 1.6058564186096191,
+  "facts": "Vegans do not consume animals or products derived from animals. The traditional Paella recipe includes rabbit and chicken as two of the ingredients.",
+  "retry_count": 0
+}
+{
+  "question_num": 12,
+  "question": "Can a lifeboat rescue people in the Hooke Sea?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.105482578277588,
+  "facts": "Lifeboats are used on bodies of liquid water The Hooke Sea is a geographical feature on the surface of Mars There are no bodies of liquid water on Mars",
+  "retry_count": 0
+}
+{
+  "question_num": 13,
+  "question": "Can a prime number be represented by the number of days in a week?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 1.8056623935699463,
+  "facts": "There are seven days in a week. Seven is a prime number.",
+  "retry_count": 0
+}
+{
+  "question_num": 14,
+  "question": "Did Gladiator's weapon of choice require less hands than Soul Calibur's Faust?",
+  "correct_answer": "yes",
+  "agent_resp": "no",
+  "is_correct": false,
+  "time_elapsed": 2.2071428298950195,
+  "facts": "Faust is a zweihander sword in the Soul Calibur video game series. A zweihander is a giant sword that requires two hands to wield. Gladiators used the Gladius which was a short one handed sword.",
+  "retry_count": 0
+}
+{
+  "question_num": 15,
+  "question": "Is the saltwater crocodile less endangered than the European otter?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 1.9069850444793701,
+  "facts": "The saltwater crocodile is listed as \"least concern\" on the International Union for the Conservation of Nature Red List. The European otter is listed as \"near threatened\" on the International Union for the Conservation of Nature Red List. The International Union for the Conservation of Nature Red List starts with \"least concern\", then \"near threatened\", \"vulnerable\", \"endangered\", \"critically endangered\", \"extinct in the wild\", and \"extinct\".",
+  "retry_count": 0
+}
+{
+  "question_num": 16,
+  "question": "Did Harvey Milk ever run for governor?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.0056891441345215,
+  "facts": "In 1977 Harvey Milk was elected to the San Francisco Board of Supervisors. Less than a year later, he was assassinated before he could run for higher offices.",
+  "retry_count": 0
+}
+{
+  "question_num": 17,
+  "question": "Are people banned from entering the Forbidden City?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.1065542697906494,
+  "facts": "The Forbidden City is a tourist attraction. Tourist attractions allow people to enter.",
+  "retry_count": 0
+}
+{
+  "question_num": 18,
+  "question": "Did Julio Gonzalez like acetylene?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.4079794883728027,
+  "facts": "Julio Gonzalez was an artist who welded metal to create sculptures Welding is achieved by using a blowtorch on metal Blowtorches use acetylene as fuel",
+  "retry_count": 0
+}
+{
+  "question_num": 19,
+  "question": "Could all of the 2008 Summer Olympics women find a hookup athlete partner?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.1062536239624023,
+  "facts": "The 2008 Summer Olympics had 4,637 women compete. The 2008 Summer Olympics had 6,305 men compete.",
+  "retry_count": 0
+}
+{
+  "question_num": 20,
+  "question": "Does conservatism repulse Blaire White?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.0081398487091064,
+  "facts": "Blaire White is a Youtuber. Blaire White posts content that leans towards conservative politics.",
+  "retry_count": 0
+}
+{
+  "question_num": 21,
+  "question": "Does Neville Longbottom have more courage as a child than as an adult?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.408607006072998,
+  "facts": "Neville Longbottom is a character from the Harry Potter series. In the first few books of the Harry Potter series, Neville is a child. In the final few books of the Harry Potter series Neville is becoming an adult.  Neville's first appearances in the series show him to be very cowardly. Neville is considered a hero by the end of the series.",
+  "retry_count": 0
+}
+{
+  "question_num": 22,
+  "question": "Are the headquarters of All Nippon Airways near a beach?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.0060629844665527,
+  "facts": "The headquarters of All Nippon Airways are located in Shiodome City Center in the Shiodome area of the Minato ward of Tokyo. Tokyo is a metropolitan area. A beach is a landform alongside a body of water. Metropolitan areas typically do not have bodies of water in the surrounding area.",
+  "retry_count": 0
+}
+{
+  "question_num": 23,
+  "question": "Are ropes required to operate a frigate?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.006662368774414,
+  "facts": "Frigates are a kind of sailing ship. Many features of ships require rope to use.",
+  "retry_count": 0
+}
+{
+  "question_num": 24,
+  "question": "Could Steven Spielberg send emails as a child?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 1.9066810607910156,
+  "facts": "Steven Spielberg was born in 1946. Email did not become available to the general public until 1995.",
+  "retry_count": 0
+}
+{
+  "question_num": 25,
+  "question": "Is there a popular Broadway character who is a missionary?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.207164764404297,
+  "facts": "The Book of Mormon is a popular Broadway musical. The two main characters are Elder Price and Elder Cunningham. They are Mormon missionaries sent to Africa to share their religion with the villagers.",
+  "retry_count": 0
+}
+{
+  "question_num": 26,
+  "question": "Is a paraplegic suitable for conducting an orchestra?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.307126760482788,
+  "facts": "Musical conductors use their hands to wave a baton and guide the orchestra. Paraplegics are people that are paralyzed from the waist down. Paraplegics are able to play sports that involve their upper body, such as basketball.",
+  "retry_count": 0
+}
+{
+  "question_num": 27,
+  "question": "Is a spice grinder ueseless for the cheapest cinnamon sticks?",
+  "correct_answer": "yes",
+  "agent_resp": "no",
+  "is_correct": false,
+  "time_elapsed": 2.306924819946289,
+  "facts": "Different species of cinnamon require different grinding methods to make the spice Indonesian cinnamon quills are thick and capable of damaging a spice or coffee grinder. Indonesian cinnamon is the most common and cheapest cinnamon in the USA",
+  "retry_count": 0
+}
+{
+  "question_num": 28,
+  "question": "Are coopers required in the beverage industry?",
+  "correct_answer": "yes",
+  "agent_resp": "yes",
+  "is_correct": true,
+  "time_elapsed": 2.206150531768799,
+  "facts": "Coopers make barrels. Barrels are used to store certain alcoholic beverages during production.",
+  "retry_count": 0
+}
+{
+  "question_num": 29,
+  "question": "Did J. P. Morgan have healthy lungs?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.2064545154571533,
+  "facts": "J. P. Morgan smoked dozens of cigars per day. Smoking tobacco damages the lungs and increases the risk of lung cancer significantly.",
+  "retry_count": 0
+}
+{
+  "question_num": 30,
+  "question": "Did Queen Elizabeth I read the works of Jean-Paul Sartre?",
+  "correct_answer": "no",
+  "agent_resp": "no",
+  "is_correct": true,
+  "time_elapsed": 2.206806182861328,
+  "facts": "Jean-Paul Sartre was born in 1905. Queen Elizabeth I died in 1603.",
+  "retry_count": 0
+}
