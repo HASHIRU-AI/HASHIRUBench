@@ -148,9 +148,9 @@ When a sub-task needs unavailable or inefficiently provided capabilities, the CE
 
 HASHIRU includes an \textbf{economic model}:
 \begin{itemize}
-    \item \textbf{Hiring Cost (``Starting Bonus''):} One-time cost upon instantiation (setup overhead) for local models.
-    \item \textbf{Invocation Cost (``Salary''):} Multi-time cost upon use (system/payment load) for local models.
-    \item \textbf{Expense Cost:} Multi-time cost for external API calls (e.g., OpenAI, Anthropic) based on token usage.
+    \item \textbf{Hiring Cost (``Starting Bonus''):} A one-time cost incurred upon instantiation of local models, representing setup overhead. This cost can be quantitatively scaled based on the resource profile of the model (e.g., higher for models requiring more VRAM or complex setup).
+    \item \textbf{Invocation Cost (``Salary''):} A recurring cost applied each time a local model is used, reflecting the operational load (e.g., inferred compute, system resource engagement). This abstracts the cost of utilizing local resources for a given task.
+    \item \textbf{Expense Cost:} A recurring cost for external API calls (e.g., OpenAI, Anthropic), typically calculated based on token usage as per the API provider's documented pricing.
 \end{itemize}
 These transaction costs discourage excessive churn, promoting stability. The CEO evaluates if replacing an agent benefits outweigh hiring/firing costs plus operational differences. This combats rigidity and allows adaptation while managing budgets and preventing wasteful turnover.
 
@@ -169,12 +169,10 @@ The CEO manages this heterogeneous pool, selecting the most appropriate resource
 \label{subsec:resource_mgmt}
 Explicit resource management is central, moving beyond simple API cost tracking. The system, coordinated by the CEO, monitors:
 \begin{itemize}
-    \item \textbf{Financial Costs:} Accumulating external API costs.
-    \item \textbf{Memory Usage:} Footprint of active Employee agents (\% of allocated budget).
-    \item \textbf{Agent Concurrency:} Count of concurrently active agents.
+    \item \textbf{Financial Costs:} Accumulating external API costs (tracked via their documented pricing) and the ``hiring'' and ``invocation'' costs from the economic model for local agents.
+    \item \textbf{Memory Usage:} Footprint of active Employee agents. For local models (e.g., running via Ollama), this can be estimated based on their known VRAM requirements as a percentage of a predefined total available budget (e.g., assuming a 16\,GiB VRAM capacity represents 100\% of the local model memory budget). This is tracked as a percentage of the overall memory budget.
+    \item \textbf{Estimated Compute:} While not directly measured in CPU cycles, ``estimated compute'' for local models is factored into their ``invocation cost'' within the economic model, providing an abstraction for resource intensity.
 \end{itemize}
-Metrics are monitored against predefined \textbf{budget limits}. Actions (like hiring) exceeding limits (e.g., $>$90\% memory, exceeding max concurrency) are prevented. This ensures operation within constraints, crucial for limited resources or strict budgets.
-
 \subsection{Tool Utilization and Autonomous Creation}
 \label{subsec:tooling}
 HASHIRU agents use predefined tools (functions, APIs, databases) to interact and perform actions beyond text generation \cite{yao2022react, openai_func_calling}.
@@ -185,8 +183,7 @@ A distinctive feature is \textbf{integrated, autonomous tool creation}. If the C
     \item Commissioning logic generation (code, potentially using external APIs with provided credentials, possibly via a code-generating agent).
     \item Deploying logic as a new, callable API endpoint within HASHIRU.
 \end{enumerate}
-To achieve this autonomous creation, HASHIRU employs a few-shot prompting approach, analyzing existing tools within its system to learn how to specify and implement new ones \cite{brown2020language}.
-This allows HASHIRU to dynamically extend its functional repertoire, tailoring capabilities to tasks without manual intervention, enabling greater autonomy and adaptation.
+To achieve this autonomous creation, HASHIRU employs a few-shot prompting approach, analyzing existing tools within its system to learn how to specify and implement new ones \cite{brown2020language}. The system can then iteratively refine the generated tool code by analyzing execution errors or suboptimal outputs, promoting self-correction. This allows HASHIRU to dynamically extend its functional repertoire, tailoring capabilities to tasks without manual intervention, enabling greater autonomy and adaptation.
 
 \subsection{Memory Function: Learning from Experience}
 \label{subsec:memory}
@@ -248,9 +245,7 @@ This task evaluates broader reasoning, knowledge retrieval, and problem-solving 
 \begin{itemize}
     \item \textbf{Humanity's Last Exam \cite{phan2025humanitysexam}:} Tests graduate-level technical knowledge and complex reasoning across domains. Requires deep understanding and sophisticated problem-solving, likely needing powerful external LLMs managed within HASHIRU's hybrid framework.
     We use a subset of 40 questions from the Humanity's Last Exam dataset.
-    \item \textbf{NYT Connections \cite{lopez2024nyt}:} Puzzle requiring identifying hidden semantic relationships/themes to categorize 16 words into four groups. Involves associative reasoning, broad knowledge, and hypothesis testing, testing knowledge access and combinatorial reasoning coordination.
     \item \textbf{Wordle:} Daily word puzzle requiring deductive reasoning to identify a five-letter word within six guesses, using feedback. Tests logical deduction, constraint satisfaction, vocabulary. Good test for comparing efficiency (speed, cost, guesses) of local vs. external models for iterative reasoning. Assumes simulated game environment.
-    \item \textbf{Globle:} Geographic deduction game identifying a target country based on proximity feedback. Tests geographic knowledge, spatial reasoning, iterative strategy based on feedback. Assumes simulated game environment.
     \item \textbf{ARC (AI2 Reasoning Challenge)\cite{boratko2018systematic}:} A benchmark featuring challenging multiple-choice science questions designed to test complex reasoning. Successfully answering these questions requires capabilities such as knowledge retrieval, logical inference, and multi-step problem-solving.
     We use a mixed set of 100 questions from the ARC Challenge, which includes both easy and hard questions.
 \end{itemize}
@@ -297,7 +292,7 @@ We evaluate using quantitative and qualitative metrics:
 
 \section{Results and Discussion}
 \label{sec:results}
-We present preliminary results from our experiments, focusing on the academic paper review task and the reasoning tasks. The results are summarized in Table \ref{tab:results}.
+We present preliminary results from our experiments, focusing on the academic paper review task, the reasoning tasks and the safety evaluation. The results are summarized in Table \ref{tab:results}.
 
 \begin{table}[htbp]
     \centering
