@@ -24,7 +24,7 @@ def get_client():
 def call_api(client, instruction, inputs, tries=0):
     if tries > 3:
         print("Error: too many tries")
-        return None
+        return ""
     client = Client("http://127.0.0.1:7860/")
     client.predict(
 		modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
@@ -125,7 +125,7 @@ def single_request(client, single_question, cot_examples_dict, exist_result):
     cot_examples = cot_examples_dict[category]
     question = single_question["question"]
     options = single_question["options"]
-    prompt = "The following are multiple choice questions (with answers) about {}. Think step by" \
+    prompt = "The following are multiple choice questions (with answers) about {}. Use agents and tools to think step by" \
              " step and then output the answer in the format of \"The answer is (X)\" at the end.\n\n" \
         .format(category)
     for each in cot_examples:
