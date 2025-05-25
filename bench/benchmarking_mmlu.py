@@ -8,40 +8,85 @@ from datasets import load_dataset
 import argparse
 import requests
 from gradio_client import Client
+from google import genai
+from google.genai import types
 
 API_KEY = ""
 random.seed(12345)
 
 def get_client():
-    client = Client("http://127.0.0.1:7860/")
-    client.predict(
-		modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-		api_name="/update_model"
-    )
-    return client
+    if args.model_name in ["hashiru"]:
+        client = Client("http://127.0.0.1:7860/")
+        client.predict(
+            modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+            api_name="/update_model"
+        )
+        return client
+    elif args.model_name in ["flash2.0"]:
+        client = genai.Client(api_key=API_KEY)
+        return client
 
 
 def call_api(client, instruction, inputs, tries=0):
-    if tries > 3:
-        print("Error: too many tries")
-        return ""
-    client = Client("http://127.0.0.1:7860/")
-    client.predict(
-		modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-		api_name="/update_model"
-    )
     start = time.time()
-    response, history = client.predict(
-                message={"text": instruction + inputs, "files": []},
-                api_name="/chat"
+    if args.model_name in ["hashiru"]:
+        if tries > 3:
+            print("Error: too many tries")
+            return ""
+        client = Client("http://127.0.0.1:7860/")
+        client.predict(
+            modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+            api_name="/update_model"
+        )
+        response, history = client.predict(
+                    message={"text": instruction + inputs, "files": []},
+                    api_name="/chat"
+                )
+        if 'error' in response["content"]:
+            time.sleep(60)
+            response = call_api(client, instruction, inputs, tries + 1)
+            return response
+            
+        print("cost time", time.time() - start)
+        return response["content"]
+    elif args.model_name in ["flash2.0"]:
+        safety_settings = [
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_NONE",
+            },
+            {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_NONE",
+            },
+            {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_NONE",
+            },
+            {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_NONE",
+            },
+        ]
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=instruction + inputs,
+                config=types.GenerateContentConfig(
+                    temperature=0.2,
+                    safety_settings=safety_settings,
+                ),
             )
-    if 'error' in response["content"]:
-        time.sleep(60)
-        response = call_api(client, instruction, inputs, tries + 1)
-        return response
-        
-    print("cost time", time.time() - start)
-    return response["content"]
+        except Exception as e:
+            if tries > 3:
+                print("Error: too many tries")
+                return ""
+            time.sleep(60)
+            output = call_api(client, instruction, inputs, tries + 1)
+            return output
+
+        print("cost time", time.time() - start)
+        return response.text
 
 
 def load_mmlu_pro():
@@ -253,15 +298,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output_dir", "-o", type=str, default="eval_results/")
     parser.add_argument("--model_name", "-m", type=str, default="gpt-4",
-                        choices=["gpt-4", "gpt-4o", "o1-preview",
-                                 "deepseek-chat", "deepseek-coder",
-                                 "gemini-1.5-flash-latest",
-                                 "gemini-1.5-pro-latest",
-                                 "claude-3-opus-20240229",
-                                 "gemini-1.5-flash-8b",
-                                 "claude-3-sonnet-20240229",
-                                 "gemini-002-pro",
-                                 "gemini-002-flash"])
+                        choices=["hashiru", "flash2.0"])
     parser.add_argument("--assigned_subjects", "-a", type=str, default="all")
     assigned_subjects = []
     args = parser.parse_args()
