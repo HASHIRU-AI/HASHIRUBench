@@ -130,7 +130,7 @@ The system uses a two-tiered hierarchy:
             \item Task Execution: Receive task, execute, return result.
             \item Resource Consumption: Associated costs (API, hardware utilization) tracked by system.
         \end{itemize}
-        Specialized employee agents are constructed using base models such as Mistral~7B~\cite{jiang2023mistral}, Llama~3~\cite{llama3herd}, Gemini~1.5~\cite{gemini1.5_report}, Qwen2.5~\cite{qwen2.5_report}, Qwen3~\cite{qwen3_blog}, and DeepSeek-R1~\cite{deepseekr1_report}, with the CEO agent configuring them via tailored system prompts.
+        Specialized employee agents are constructed using base models such as Mistral~7B~\cite{jiang2023mistral}, Llama~3~\cite{llama3herd}, Gemini~1.5~\cite{gemini1.5_report}, Qwen2.5~\cite{qwen2.5_report}, Qwen3~\cite{qwen3_blog}, and DeepSeek-R1~\cite{deepseekr1_report}, with the CEO agent configuring them via tailored system prompts that it generates based on the task requirements.
         The models will be run locally using Ollama~\cite{ollama}, and via API calls to external models such as Gemini 2.5 Flash~\cite{gemini25flash} and other models hosted on Hugging Face~\cite{huggingface2025}, Groq~\cite{groq2025}, Lambda.ai~\cite{lambda2025}, and other platforms.
 \end{itemize}
 This hierarchy facilitates task decomposition and result aggregation; the dynamic pool provides flexibility.
@@ -247,6 +247,7 @@ We use a dataset of 50 papers from ICLR 2023 with a prompt eliciting multiple re
 This task evaluates broader reasoning, knowledge retrieval, and problem-solving under constraints using challenging benchmarks and puzzles:
 \begin{itemize}
     \item \textbf{Humanity's Last Exam \cite{phan2025humanitysexam}:} Tests graduate-level technical knowledge and complex reasoning across domains. Requires deep understanding and sophisticated problem-solving, likely needing powerful external LLMs managed within HASHIRU's hybrid framework.
+    We use a subset of 40 questions from the Humanity's Last Exam dataset.
     \item \textbf{NYT Connections \cite{lopez2024nyt}:} Puzzle requiring identifying hidden semantic relationships/themes to categorize 16 words into four groups. Involves associative reasoning, broad knowledge, and hypothesis testing, testing knowledge access and combinatorial reasoning coordination.
     \item \textbf{Wordle:} Daily word puzzle requiring deductive reasoning to identify a five-letter word within six guesses, using feedback. Tests logical deduction, constraint satisfaction, vocabulary. Good test for comparing efficiency (speed, cost, guesses) of local vs. external models for iterative reasoning. Assumes simulated game environment.
     \item \textbf{Globle:} Geographic deduction game identifying a target country based on proximity feedback. Tests geographic knowledge, spatial reasoning, iterative strategy based on feedback. Assumes simulated game environment.
@@ -315,6 +316,7 @@ We present preliminary results from our experiments, focusing on the academic pa
         Paper Review    & 58   & N/A & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
         JailbreakBench  & 100  & N/A & $\approx$1   & Negligible (CEO model) \\
         AI2 Reasoning Challenge & 96   & 95  & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        Humanity's Last Exam & 5   & 2.5  & $\approx$15   & Moderate to High (1 DeepSeek-R1 7B~\cite{deepseekr1_report}) \\
         \bottomrule
     \end{tabular}
 \end{table}
