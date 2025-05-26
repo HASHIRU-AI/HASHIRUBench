@@ -5,7 +5,8 @@ import os
 from datetime import datetime
 import re
 from datasets import load_dataset
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 
 def sanitize_response(input_str):
@@ -76,12 +77,29 @@ def benchmark_strategyqa(df, out_dir="strategyqa_baseline_results", num_question
     try:
         load_dotenv()
         api_key = os.getenv("GEMINI_KEY")
-        genai.configure(api_key=os.getenv("GEMINI_KEY"))
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        client = genai.Client(api_key=api_key)
+        # return client
     except Exception as e:
         print(f"Error connecting to client: {e}")
         return
-    
+    safety_settings = [
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_NONE",
+            },
+            {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_NONE",
+            },
+            {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_NONE",
+            },
+            {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_NONE",
+            },
+        ]
     correct_resp = 0
     total_processed = 0
     
@@ -112,7 +130,14 @@ def benchmark_strategyqa(df, out_dir="strategyqa_baseline_results", num_question
         
         while retry_count < max_retries:
             try:
-                response = model.generate_content(prompt.strip())
+                response = response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=0.2,
+                        safety_settings=safety_settings,
+                    ),
+                )
                 agent_resp = sanitize_response(response.text)
                 
                 if agent_resp:
@@ -162,6 +187,7 @@ def benchmark_strategyqa(df, out_dir="strategyqa_baseline_results", num_question
               f"Time: {elapsed:.2f}s")
         
         time.sleep(30)  # Reduced from 50s for faster testing
+        client = genai.Client(api_key=api_key)
     
     # Final summary
     final_accuracy = (correct_resp / total_processed) * 100

@@ -173,6 +173,18 @@ def benchmark_strategyqa(df, out_dir="strategyqa_results", num_questions=10):
               f"Time: {elapsed:.2f}s")
         
         time.sleep(30)  # Reduced from 50s for faster testing
+        try:
+            print("Re init client")
+            client = Client("http://127.0.0.1:7860/")
+            client.predict(
+                modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS",
+                            "ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET",
+                            "ENABLE_ECONOMY_BUDGET"],
+                api_name="/update_model"
+            )
+        except Exception as e:
+            print(f"Error connecting to client: {e}")
+            return
     
     # Final summary
     final_accuracy = (correct_resp / total_processed) * 100
