@@ -72,6 +72,7 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
     correct = 0
     for i, sample in enumerate(data):
         question = sample["question"]
+        context = sample.get("text", "")
         gold = sample["answer"]
 
         if question in done_questions:
@@ -79,12 +80,21 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
 
         print(f"\n[{i+1}/{len(data)}] {question[:60]}...")
 
-        prompt = (
-            "You are given a paraphrased legal contract clause.\n"
-            f"Clause: \"{question}\"\n"
-            "Does this clause imply the concept asked about?\n"
-            "Respond only as FINAL ANSWER: Yes or FINAL ANSWER: No."
-        )
+        if context:
+            prompt = (
+                "You are given a legal contract clause and a question.\n"
+                f"Clause: \"{context}\"\n"
+                f"Question: \"{question}\"\n"
+                "Does the clause imply the concept asked about?\n"
+                "Respond only as FINAL ANSWER: Yes or FINAL ANSWER: No."
+            )
+        else:
+            prompt = (
+                "You are given a paraphrased legal contract clause.\n"
+                f"Clause: \"{question}\"\n"
+                "Does this clause imply the concept asked about?\n"
+                "Respond only as FINAL ANSWER: Yes or FINAL ANSWER: No."
+            )
 
         try:
             start = time.time()
@@ -145,6 +155,7 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
 
             result = {
                 "question": question,
+                "context": context,
                 "gold_answer": gold,
                 "model_response": answer,
                 "normalized_prediction": pred_clean,
