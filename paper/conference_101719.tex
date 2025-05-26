@@ -122,7 +122,7 @@ The system uses a two-tiered hierarchy:
             \item Managing overall resource budget (Section \ref{subsec:resource_mgmt}).
             \item Initiating new tool creation (Section \ref{subsec:tooling}).
         \end{itemize}
-        We use Gemini 2.0 Flash~\cite{gemini20flash} as the CEO agent due to its strong reasoning capabilities, support for tool usage, and cost efficiency, making it a practical and capable choice for our deployment. 
+        We use Gemini 2.0 Flash~\cite{gemini20flash} as the CEO agent. To further enhance its planning and reasoning abilities, its system prompt is designed to evoke inherent chain-of-thought processes~\cite{wei2022chain} when tackling complex user queries and managing sub-tasks. This complements its strong baseline reasoning capabilities, tool usage support, and cost efficiency, making it a practical and capable choice for our deployment.
     \item \textbf{Employee Agents:} Specialized agents instantiated by the CEO for specific sub-tasks. Each typically wraps an LLM (local via Ollama \cite{ollama} or external API) or provides tool access. Characteristics:
         \begin{itemize}
             \item Specialization: Capabilities tailored to task types (code, data analysis, info retrieval).
@@ -262,10 +262,9 @@ The CEO model's central role in task delegation introduces a potential vulnerabi
 
 \subsection{Baselines for Comparison}
 \label{subsec:baselines}
-To quantify HASHIRU's benefits, we compare its performance against the baseline of its CEO agent (Gemini 2.0 Flash~\cite{gemini20flash}) operating in isolation, without dynamic management or hybrid intelligence.
+To quantify HASHIRU's benefits, we compare its performance against the baseline of Gemini 2.0 Flash~\cite{gemini20flash} operating in isolation.
 We chose Gemini 2.0 Flash as the baseline due to our architecture's efficacy being tied to augmenting the capabilities of a single agent. This choice allows us to isolate the impact of our dynamic management and hybrid intelligence features, providing a clear comparison point.
-We also compare against the token cost of a powerful reasoning model, i.e., Gemini 2.5 Flash~\cite{gemini25flash}, to assess the cost-effectiveness of our approach.
-If our architecture is effective, we expect to see higher accuracy compared to the baseline, while also being more cost-effective than using a single powerful model. This will demonstrate the advantages of our hybrid approach in practical applications.
+If our architecture is effective, we expect to see higher accuracy compared to the baseline, while also being more cost-effective than using a single powerful model by invoking free online tools and lesser powerful models to synthesize the results of running the tools. This will demonstrate the advantages of our hybrid approach in practical applications.
 
 For paper reviews, we just evaluate HASHIRU's accuracy in predication of decisions of acceptance with the ground truth. Since the task is, by design, involving multiple agents, it is not possible to replicate autonomously with a single agent.
 While we could invoke three Gemini 2.0 Flash agents, it would not be a fair comparison, as the ``personalities'' and ``expertise'' of the agents would have to be manually specified, which is not the case in HASHIRU.
@@ -350,7 +349,7 @@ Current limitations primarily involve the CEO's capacity for highly complex task
 
 Addressing these and extending HASHIRU's capabilities offers several avenues for future work. Future research will focus on enhancing CEO intelligence and exploring distributed cognition. We also plan to develop a comprehensive tool management lifecycle, create adaptive economic models, and conduct rigorous benchmarking. A significant addition to our research agenda is the introduction of calibration as a metric for tool invocation. This would involve enabling the system to assess its own confidence in its internal capabilities versus the potential output of an external tool. If the model is unsure about its own answer or predicts a higher utility from a tool's output (factoring in the tool's own confidence or reliability), it can decide to invoke the tool. This approach would involve judging the confidence of the tool against its own, potentially leading to more efficient and accurate task resolution. Research in areas such as quantifying uncertainty in LLM-based tool-using systems and calibrating LLM confidence scores (e.g., \cite{manggalaqa, spiess2024calibration}) will inform this development. The broader context of large language models learning to use a wide array of tools (e.g., \cite{Qin2023ToolLLM}) also highlights the importance of robust mechanisms for deciding when and how to invoke such tools.
 
-Improving system explainability, expanding the local model repertoire, specializing the architecture for certain tasks like paper review, and formalizing an ethical safety framework are also key priorities.
+Improving system explainability through ablation, expanding the local model repertoire, specializing the architecture for certain tasks like paper review, and formalizing an ethical safety framework are also key priorities.
 
 \section*{Acknowledgments}
 
