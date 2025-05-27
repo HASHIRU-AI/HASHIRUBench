@@ -73,9 +73,9 @@ def benchmark_gsm8k(num_samples=1, offset=0):
         if split in dataset:
             all_samples.extend(dataset[split])
 
+    all_samples = all_samples[offset:]
     if num_samples:
         all_samples = random.sample(all_samples, num_samples)
-    all_samples = all_samples[offset:]
     results = []
     for i, sample in enumerate(all_samples):
         start = time.time()
