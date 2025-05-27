@@ -105,7 +105,7 @@ def benchmark_local(
             retry = 0
             t0 = time.time()
             while True:
-                response = model.generate_content(prompt, temperature=0.2)
+                response = model.generate_content(prompt, generation_config=genai.types.GenerationConfig(temperature=0.2))
                 agent_text = response.text.strip()
 
                 # If FINAL ANSWER not found, ask the model once more (up to max_retries)

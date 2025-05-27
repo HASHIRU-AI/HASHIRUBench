@@ -76,13 +76,13 @@ def benchmark_local(
     client = Client(agent_url)
     client.predict(
         modeIndexes=[
-            # "ENABLE_AGENT_CREATION",
-            # "ENABLE_LOCAL_AGENTS",
-            # "ENABLE_CLOUD_AGENTS",
-            # "ENABLE_TOOL_CREATION",
-            # "ENABLE_TOOL_INVOCATION",
-            # "ENABLE_RESOURCE_BUDGET",
-            # "ENABLE_ECONOMY_BUDGET",
+            "ENABLE_AGENT_CREATION",
+            "ENABLE_LOCAL_AGENTS",
+            "ENABLE_CLOUD_AGENTS",
+            "ENABLE_TOOL_CREATION",
+            "ENABLE_TOOL_INVOCATION",
+            "ENABLE_RESOURCE_BUDGET",
+            "ENABLE_ECONOMY_BUDGET",
         ],
         api_name="/update_model",
     )
