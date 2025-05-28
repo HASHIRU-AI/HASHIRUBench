@@ -58,7 +58,15 @@ def benchmark_gsm8k(num_samples=1, offset=0):
     
     client = Client("http://127.0.0.1:7860/")
     client.predict(
-		modeIndexes=[],
+		modeIndexes=[
+            "ENABLE_AGENT_CREATION",
+            "ENABLE_LOCAL_AGENTS",
+            "ENABLE_CLOUD_AGENTS",
+            "ENABLE_TOOL_CREATION",
+            "ENABLE_TOOL_INVOCATION",
+            "ENABLE_RESOURCE_BUDGET",
+            "ENABLE_ECONOMY_BUDGET",
+        ],
 		api_name="/update_model"
     )
 
@@ -83,7 +91,7 @@ def benchmark_gsm8k(num_samples=1, offset=0):
         answer = sample['answer']
         answer_only = sample['answer'].split("####")[1].strip()  # Extract answer before any explanation
         
-        prompt = f"You are a student agent taking a math test. " \
+        prompt = f"Help: You are a student agent taking a math test. " \
                 f"Feel free to use tools or agents to help you answer the question. " \
                 f"You can decide what tools or agents to use. " \
                 f"Your goal is to answer the question correctly. " \
