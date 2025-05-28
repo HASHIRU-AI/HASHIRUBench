@@ -219,18 +219,22 @@ Figure \ref{fig:budget_management} illustrates how HASHIRU refuses to use an ext
 
 \subsection{Case Study 4: Learning from Experience through Error Analysis and Knowledge Retrieval}
 \label{sec:casestudy4_experiential_learning}
-Enhancing performance by learning from past interactions is a critical aspect of intelligent systems. HASHIRU demonstrates this capability in an environment that combines principles akin to pseudo-Reinforcement Learning (RL) with a Retrieval Augmented Generation (RAG) framework for its knowledge base. In one instance, HASHIRU was tasked with a question from the Humanity's Last Exam (HLE) benchmark and initially provided an incorrect answer.
-
-Upon receiving the correct solution (a form of human feedback, central to RLHF approaches~\cite{ziegler2019fine,ouyang2022training}), HASHIRU was prompted to analyze its mistake. This self-critique process involved identifying the discrepancies between its erroneous output and the correct answer, and then generalizing this analysis into actionable, generic advice. This newly formulated advice was then stored within HASHIRU's internal knowledge base, which, as mentioned before, is managed using RAG principles. This allows the system to augment its future generation processes with retrieved knowledge.
-
-Subsequently, when presented with a similar HLE question, intentionally modified with noise to test robustness, HASHIRU was able to query its knowledge base. It successfully retrieved the relevant stored advice generated from the previous error analysis. By incorporating this retrieved wisdom, HASHIRU correctly answered the noise-induced question, showcasing its ability to learn from specific failures, store generalized lessons, and apply them to novel situations. This iterative loop of error analysis, knowledge storage, and retrieval-augmented decision-making exemplifies a practical mechanism for self-improvement and resilience to variations in input, reflecting concepts of self-reflective RAG and continuous learning from interactions~\cite{asai2023self,shinn2023reflexion}.
+HASHIRU learns from errors using a pseudo-Reinforcement Learning (RL) approach and a Retrieval Augmented Generation (RAG) knowledge base. After an initial incorrect answer on a Humanity's Last Exam (HLE) benchmark, HASHIRU used the correct solution (similar to RLHF approaches~\cite{ziegler2019fine,ouyang2022training}) to self-critique, generate actionable advice, and store it via RAG. When faced with a similar, noise-altered HLE question, HASHIRU retrieved this advice and succeeded. This cycle—error analysis, knowledge storage, and retrieval-augmented decision-making—demonstrates robust self-improvement and resilience, aligning with concepts of self-reflective RAG and continuous learning from interactions~\cite{asai2023self,shinn2023reflexion} (Figure \ref{fig:error_analysis}).
 
 % insert figure here
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.45\textwidth]{budget2.png}
+    \includegraphics[width=0.35\textwidth]{budget2.png}
     \caption{HASHIRU's autonomous budget management system, ensuring efficient resource utilization and preventing overspending.}
     \label{fig:budget_management}
+\end{figure}
+
+% insert figure here
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{casestudy4.png}
+    \caption{HASHIRU's error analysis and knowledge retrieval process, enabling learning from past interactions.}
+    \label{fig:error_analysis}
 \end{figure}
 
 \section{Experimental Setup}
@@ -261,7 +265,7 @@ This task evaluates broader reasoning, knowledge retrieval, and problem-solving 
     \item \textbf{StrategyQA \cite{geva2021strategyqa}:} A benchmark of 2,780 yes/no questions that require implicit multi-step reasoning. Each question is annotated with a decomposition into reasoning steps and supporting evidence from Wikipedia. StrategyQA evaluates a system's ability to infer and execute reasoning strategies not explicitly stated in the question, making it a valuable test for assessing complex reasoning capabilities.
     We use a subset of 100 questions from the StrategyQA dataset.
     \item \textbf{JEEBench \cite{arora-etal-2023-llms}:} A challenging benchmark for LLMs, featuring 515 pre-engineering mathematics, physics, and chemistry problems from the IIT JEE-Advanced exam. Requires long-horizon reasoning and deep in-domain knowledge. 
-    We use a subset of 100 questions from the JEEBench dataset.
+    We use a subset of 120 questions from the JEEBench dataset.
     \item \textbf{GSM8K \cite{cobbe2021gsm8k}:} A dataset of 8.5K grade school math word problems designed to evaluate the mathematical reasoning abilities of language models. Requires multi-step reasoning to arrive at the solution.
     We use a subset of 100 questions from the GSM8K dataset.
     \item \textbf{SVAMP \cite{patel2021nlp}:} A dataset of math word problems specifically designed to evaluate a model's question sensitivity, robust reasoning ability, and invariance to structural alterations. Requires multi-step arithmetic and logical inference.
@@ -326,7 +330,7 @@ We present preliminary results from our experiments, focusing on the academic pa
                     >{\raggedright\arraybackslash}p{1.5cm}
                     }
         \toprule
-        \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{t-test Value} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
+        \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{p-value} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
         \midrule
         Paper Review    & \textbf{58}   & N/A & N/A       & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
         \midrule % Added horizontal rule
@@ -366,13 +370,9 @@ Collectively, these findings suggest that HASHIRU's architecture, with its empha
 \section{Limitations and Future Work}
 \label{sec:limitations_future_work}
 
-While HASHIRU introduces novel concepts for adaptable, resource-aware MAS, it presents limitations and opportunities for future research.
+Current limitations in HASHIRU include the CEO's capacity for highly complex tasks and the scalability of its centralized control. Further development is also needed for robust autonomous tool creation and alignment, effective economic model calibration, and optimizing memory for extensive histories.
 
-Current limitations primarily involve the CEO's capacity for highly complex tasks and the scalability of its centralized control. Ensuring the robustness and alignment of autonomous tool creation, effectively calibrating the economic model, and optimizing the memory function for extensive histories also require further attention.
-
-Addressing these and extending HASHIRU's capabilities offers several avenues for future work. Future research will focus on enhancing CEO intelligence and exploring distributed cognition. We also plan to develop a comprehensive tool management lifecycle, create adaptive economic models, and conduct rigorous benchmarking. A significant addition to our research agenda is the introduction of calibration as a metric for tool invocation. This would involve enabling the system to assess its own confidence in its internal capabilities versus the potential output of an external tool. If the model is unsure about its own answer or predicts a higher utility from a tool's output (factoring in the tool's own confidence or reliability), it can decide to invoke the tool. This approach would involve judging the confidence of the tool against its own, potentially leading to more efficient and accurate task resolution. Research in areas such as quantifying uncertainty in LLM-based tool-using systems and calibrating LLM confidence scores (e.g., \cite{manggalaqa, spiess2024calibration}) will inform this development. The broader context of large language models learning to use a wide array of tools (e.g., \cite{Qin2023ToolLLM}) also highlights the importance of robust mechanisms for deciding when and how to invoke such tools.
-
-Improving system explainability through ablation, expanding the local model repertoire, specializing the architecture for certain tasks like paper review, and formalizing an ethical safety framework are also key priorities.
+Future work will address these limitations and enhance HASHIRU's capabilities. Priorities include improving CEO intelligence, exploring distributed cognition, developing a comprehensive tool management lifecycle, creating adaptive economic models, and rigorous benchmarking. A core initiative is introducing calibration for tool invocation: HASHIRU will assess its internal confidence against a tool's potential output and reliability, invoking tools when uncertain or if a tool promises higher utility, thereby aiming for more efficient and accurate task resolution. This development draws on research in LLM uncertainty quantification and confidence calibration (e.g., \cite{manggalaqa, spiess2024calibration}), crucial given the expanding tool use by LLMs (e.g., \cite{Qin2023ToolLLM}). Other key efforts will focus on system explainability through ablation, expanding the local model repertoire, specializing architecture for tasks like paper review, code, and formalizing an ethical safety framework.
 
 \section*{Acknowledgments}
 
