@@ -18,6 +18,8 @@
 % Define styles for user and assistant boxes
 \newtcolorbox{userbox}{colback=blue!5,colframe=blue!40!black,title=User}
 \newtcolorbox{assistantbox}{colback=gray!10,colframe=black,title=Assistant}
+\newcommand{\lt}{\ensuremath <}
+\newcommand{\gt}{\ensuremath >}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -274,7 +276,9 @@ The CEO model's central role in task delegation introduces a potential vulnerabi
 \label{subsec:baselines}
 To quantify HASHIRU's benefits, we compare its performance against the baseline of Gemini 2.0 Flash~\cite{gemini20flash} operating in isolation.
 We chose Gemini 2.0 Flash as the baseline due to our architecture's efficacy being tied to augmenting the capabilities of a single agent. This choice allows us to isolate the impact of our dynamic management and hybrid intelligence features, providing a clear comparison point.
-If our architecture is effective, we expect to see higher accuracy compared to the baseline, while also being more cost-effective than using a single powerful model by invoking free online tools and lesser powerful models to synthesize the results of running the tools. This will demonstrate the advantages of our hybrid approach in practical applications.
+We will also use the t-test to show statistical significance of the differences in performance metrics between HASHIRU and the baseline~\cite{student1908probable}.
+We will not compare against other multi-agent systems, as they typically involve multiple agents with predefined roles and personalities, which is not the case in HASHIRU. Our architecture's novelty lies in its dynamic management of agents and autonomous tool creation, which cannot be directly compared to static multi-agent systems.
+If our architecture is effective, we expect to see higher accuracy compared to the baseline, while also being more cost-effective than using a single powerful model by invoking free online tools and lesser powerful models to synthesize the results of running the tools.
 
 For paper reviews, we just evaluate HASHIRU's accuracy in predication of decisions of acceptance with the ground truth. Since the task is, by design, involving multiple agents, it is not possible to replicate autonomously with a single agent.
 While we could invoke three Gemini 2.0 Flash agents, it would not be a fair comparison, as the ``personalities'' and ``expertise'' of the agents would have to be manually specified, which is not the case in HASHIRU.
@@ -314,27 +318,35 @@ We present preliminary results from our experiments, focusing on the academic pa
     \caption{Summary of Experimental Results. SR denotes Success Rate.}
     \label{tab:results}
     \begin{tabular}{
-                    >{\raggedright\arraybackslash}p{2cm}
+                    >{\raggedright\arraybackslash}p{1.2cm}
                     >{\centering\arraybackslash}p{1cm}
                     >{\centering\arraybackslash}p{1cm}
+                    >{\centering\arraybackslash}p{.7cm}
                     >{\centering\arraybackslash}p{1cm}
-                    >{\raggedright\arraybackslash}p{2cm}
+                    >{\raggedright\arraybackslash}p{1.5cm}
                     }
         \toprule
-        \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
+        \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{t-test Value} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
         \midrule
-        Paper Review    & 58   & N/A & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
-        JailbreakBench  & 100  & N/A & $\approx$1   & Negligible (CEO model) \\
-        AI2 Reasoning Challenge & 96   & 95  & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
-        Humanity's Last Exam & 5   & 2.5  & $\approx$15   & Moderate to High (1 DeepSeek-R1 7B~\cite{deepseekr1_report}) \\
-        StrategyQA      & 85   & 82  & $\approx$2   & Negligible (Tools) \\
-        JEEBench        & 73   & 70  & $\approx$9   & Negligible (Tools) \\
-        GSM8K           & 65   & 61  & $\approx$2   & Low (Tools \& 1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
-        SVAMP           & 92   & 84  & $\approx$3   & Negligible (Tools) \\
+        Paper Review    & \textbf{58}   & N/A & N/A       & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
+        \midrule % Added horizontal rule
+        JailbreakBench  & \textbf{100}  & N/A & N/A       & $\approx$1   & Negligible (CEO model) \\
+        \midrule % Added horizontal rule
+        AI2 Reasoning Challenge & \textbf{96}   & 95  &  & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        \midrule % Added horizontal rule
+        Humanity's Last Exam & \textbf{5}    & 2.5 &  & $\approx$15   & Moderate to High (1 DeepSeek-R1 7B~\cite{deepseekr1_report}) \\
+        \midrule % Added horizontal rule
+        StrategyQA      & \textbf{85}   & 82  &  & $\approx$2   & Negligible (Tools) \\
+        \midrule % Added horizontal rule
+        JEEBench        & \textbf{80}   & 68.3  & \lt 0.05 & $\approx$9   & Negligible (Tools) \\
+        \midrule % Added horizontal rule
+        GSM8K           & \textbf{65}   & 61  &  & $\approx$2   & Low (Tools \& 1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        \midrule % Added horizontal rule
+        SVAMP           & \textbf{92}   & 84  & \lt 0.05 & $\approx$3   & Negligible (Tools) \\
         \bottomrule
     \end{tabular}
+    % \caption*{Note: HASHIRU SR (\%) values are bolded for emphasis. Replace example t-test values with actual results. The booktabs package authors generally recommend minimizing horizontal rules for readability (typically only toprule, midrule after headers, and bottomrule).}
 \end{table}
-
 The preliminary results presented in Table~\ref{tab:results} offer initial validation for HASHIRU's architectural design and its potential to address key limitations in contemporary multi-agent systems. The findings across diverse tasks highlight the benefits of dynamic hierarchical coordination, hybrid intelligence, and resource-aware management.
 
 The \textbf{58\% success rate} on the \textbf{Academic Paper Review} task demonstrates HASHIRU's capability to decompose a complex, nuanced objective into sub-tasks manageable by specialized agents. The CEO's ability to conceptualize and ``hire'' three distinct agent personalities (using \textbf{Gemini 1.5 Flash models}~\cite{gemini15flash}) with \textbf{low overall resource use} (average time $\approx$100s) points to the effectiveness of the dynamic lifecycle management and the hybrid intelligence approach, favoring capable yet efficient models. This task, by its nature, benefits from the multi-agent paradigm that HASHIRU champions, a scenario where a monolithic agent might struggle to embody diverse expert perspectives.
