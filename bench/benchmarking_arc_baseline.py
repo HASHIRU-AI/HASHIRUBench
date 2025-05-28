@@ -5,7 +5,9 @@ import time
 import os
 from datetime import datetime
 import re
-
+from google import genai
+from google.genai import types
+from dotenv import load_dotenv
 def sanitize_response(input_str):
     # Regex to match formats like: {choice: a}, choice: "B", etc.
     pattern = r"{\"choice\":\s*\"(\w)\"}"
@@ -17,7 +19,7 @@ def sanitize_response(input_str):
     return None
 
 
-def benchmark_arc(df, out_dir= "ai2_arc_results", num_questions=10):
+def benchmark_arc(df, out_dir= "./HASHIRU_results/ai2_arc_results/base", num_questions=10):
     all_questions = df.sample(n=num_questions, random_state=39)
     
     #prepare output
@@ -26,12 +28,33 @@ def benchmark_arc(df, out_dir= "ai2_arc_results", num_questions=10):
     out_path = os.path.join(out_dir, f"ai12_arc_benchmark_{timestamp}.jsonl")
     print(f"Writing results to {out_path}")
     
-    # init client
-    client = Client("http://127.0.0.1:7860/")
-    client.predict(
-		modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-		api_name="/update_model"
-    )
+    # Initialize Gemini client
+    try:
+        load_dotenv()
+        api_key = os.getenv("GEMINI_KEY")
+        client = genai.Client(api_key=api_key)
+        # return client
+    except Exception as e:
+        print(f"Error connecting to client: {e}")
+        return
+    safety_settings = [
+        {
+            "category": "HARM_CATEGORY_HARASSMENT",
+            "threshold": "BLOCK_NONE",
+        },
+        {
+            "category": "HARM_CATEGORY_HATE_SPEECH",
+            "threshold": "BLOCK_NONE",
+        },
+        {
+            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            "threshold": "BLOCK_NONE",
+        },
+        {
+            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+            "threshold": "BLOCK_NONE",
+        },
+    ]
     correct_resp = 0
     total_processed = 0
     for i, row in all_questions.iterrows():
@@ -46,23 +69,31 @@ def benchmark_arc(df, out_dir= "ai2_arc_results", num_questions=10):
                 f"You have the following choices to answer: {choices}" \
                 f"You Have to choose one of the provided choices as the correct answer." \
                 "Reply with the selected choice. The response format should be \{\"choice\":\"<OPTION>\"\}. It should not have anything else."
-        
-        while True:
-            job = client.submit(
-                message={"text": prompt.strip(), "files": []},
-                api_name="/chat",
-            )
-            while not job.done():
-                time.sleep(0.1)
-            response, _history = job.outputs()[-1]
-            agent_resp = sanitize_response(_history[-1].get("content", ""))
-            if agent_resp:
-                break
-            else:
-                prompt = "The response does not follow the format \{\"choice\":\"<OPTION>\"\}. Please try to answer the question with the correct requested format"
-                print("invalid response retrying")
+        max_retries = 3
+        retry_count = 0
+        agent_resp = None
+        while retry_count < max_retries:
+            try:
+                response = response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=0.2,
+                        safety_settings=safety_settings,
+                    ),
+                )
+                agent_resp = sanitize_response(response.text)
+                if agent_resp:
+                    break
+                else:
+                    prompt = "The response does not follow the format \{\"choice\":\"<OPTION>\"\}. Please try to answer the question with the correct requested format"
+                    print("invalid response retrying")
+                    time.sleep(10)
+                    continue
+            except Exception as e:
+                print(f"Error during API call: {e}")
+                retry_count += 1
                 time.sleep(10)
-                continue
         elapsed = time.time() - start
         result = {
             "question_num": question_number,
@@ -83,12 +114,8 @@ def benchmark_arc(df, out_dir= "ai2_arc_results", num_questions=10):
         print(f"Question {total_processed}/{num_questions} - "
               f"Score: {correct_resp}/{total_processed} ({accuracy:.1f}%) - "
               f"Time: {elapsed:.2f}s")
-        client = Client("http://127.0.0.1:7860/")
-        client.predict(
-            modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-            api_name="/update_model"
-        )
-        time.sleep(50)
+        client = genai.Client(api_key=api_key)
+        time.sleep(30)
 
 if __name__ == "__main__":
 
