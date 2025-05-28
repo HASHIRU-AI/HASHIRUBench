@@ -6,7 +6,7 @@ import random
 import re
 from datetime import datetime
 from time import sleep
-from datasets import load_dataset
+from datasets import load_dataset, get_dataset_config_names
 from dotenv import load_dotenv
 import google.generativeai as genai
 from google.generativeai.types import GenerationConfig
@@ -25,9 +25,9 @@ def get_last_assistant_content(resp):
     for turn in reversed(resp):
         if turn.get("role") != "assistant":
             continue
-        if turn.get("content"):
-            return turn["content"]
         cont = turn.get("content")
+        if isinstance(cont, str):
+            return cont
         if isinstance(cont, dict):
             parts = cont.get("parts", [])
             if parts and parts[0].get("text"):
@@ -36,8 +36,8 @@ def get_last_assistant_content(resp):
 
 
 def extract_prediction(answer):
-    match = re.search(r"final answer\s*:\s*(yes|no)", answer, re.IGNORECASE)
-    return match.group(1).capitalize() if match else None
+    match = re.search(r"final answer\s*:\s*(.*)", answer, re.IGNORECASE)
+    return match.group(1).strip() if match else None
 
 
 def load_existing_questions(results_file):
@@ -47,54 +47,85 @@ def load_existing_questions(results_file):
         return set(json.loads(line)["question"] for line in f if line.strip())
 
 
-def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server_url="http://127.0.0.1:7860"):
-    print(f"Loading task: {task_name}")
+def get_question_text(sample):
+    return (
+        sample.get("question")
+        or sample.get("input")
+        or sample.get("prompt")
+        or sample.get("text")
+        or json.dumps(sample)
+    )
+
+
+def build_prompt(sample):
+    question = get_question_text(sample)
+    context = sample.get("text", "")
+    answer = str(sample.get("answer", "")).strip()
+
+    yes_no_set = {"yes", "no"}
+    is_binary = answer.lower() in yes_no_set
+
+    if is_binary:
+        if context:
+            prompt = (
+                "You are given a legal scenario and a question.\n"
+                f"Context: \"{context}\"\n"
+                f"Question: \"{question}\"\n"
+                "Respond only with FINAL ANSWER: Yes or FINAL ANSWER: No."
+            )
+        else:
+            prompt = (
+                "You are given a legal question.\n"
+                f"Question: \"{question}\"\n"
+                "Respond only with FINAL ANSWER: Yes or FINAL ANSWER: No."
+            )
+    else:
+        if context:
+            prompt = (
+                "You are given a legal scenario and a question.\n"
+                f"Context: \"{context}\"\n"
+                f"Question: \"{question}\"\n"
+                "Respond with your answer as FINAL ANSWER: <your answer here>."
+            )
+        else:
+            prompt = (
+                "You are given a legal question.\n"
+                f"Question: \"{question}\"\n"
+                "Respond with your answer as FINAL ANSWER: <your answer here>."
+            )
+    return prompt
+
+
+def run_benchmark(task_name, model_name, num_samples, offset, output_dir, results_file, server_url="http://127.0.0.1:7860"):
+    print(f"\nLoading task: {task_name}")
     dataset = load_dataset("nguha/legalbench", task_name)
     data = dataset["test"]
 
-    # Fixed sampling with reproducibility
     random.seed(42)
-    indices = sorted(random.sample(range(offset, len(data)), num_samples))
+    indices = sorted(random.sample(range(offset, len(data)), min(num_samples, len(data))))
     data = data.select(indices)
 
     os.makedirs(output_dir, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    results_file = os.path.join(output_dir, f"{task_name}_{model_name}_{timestamp}.jsonl")
-
     done_questions = load_existing_questions(results_file)
-    print(f"Skipping {len(done_questions)} questions already evaluated.")
-    print(f"Saving new results to: {results_file}")
+    print(f"Skipping {len(done_questions)} already evaluated so far.")
+    print(f"Appending new results to: {results_file}")
 
     if model_name == "flash2.0":
         genai.configure(api_key=API_KEY)
         flash_model = genai.GenerativeModel("gemini-2.0-flash")
 
     correct = 0
-    for i, sample in enumerate(data):
-        question = sample["question"]
-        context = sample.get("text", "")
-        gold = sample["answer"]
+    total = 0
 
+    for i, sample in enumerate(data):
+        question = get_question_text(sample)
         if question in done_questions:
             continue
 
-        print(f"\n[{i+1}/{len(data)}] {question[:60]}...")
+        prompt = build_prompt(sample)
+        gold = str(sample.get("answer", "")).strip()
 
-        if context:
-            prompt = (
-                "You are given a legal contract clause and a question.\n"
-                f"Clause: \"{context}\"\n"
-                f"Question: \"{question}\"\n"
-                "Does the clause imply the concept asked about?\n"
-                "Respond only as FINAL ANSWER: Yes or FINAL ANSWER: No."
-            )
-        else:
-            prompt = (
-                "You are given a paraphrased legal contract clause.\n"
-                f"Clause: \"{question}\"\n"
-                "Does this clause imply the concept asked about?\n"
-                "Respond only as FINAL ANSWER: Yes or FINAL ANSWER: No."
-            )
+        print(f"[{i + 1}/{len(data)}] {question[:60]}...")
 
         try:
             start = time.time()
@@ -120,7 +151,7 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
 
                 retry = 0
                 while "final answer" not in answer.lower() and retry < MAX_RETRIES:
-                    print(f"  ...waiting for FINAL ANSWER (retry {retry+1}/{MAX_RETRIES})")
+                    print(f"  ...waiting for FINAL ANSWER (retry {retry + 1}/{MAX_RETRIES})")
                     sleep(RETRY_DELAY)
                     response, history = client.predict(
                         message={"text": "Please give FINAL ANSWER only.", "files": []},
@@ -141,10 +172,9 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
                     ]
                 )
                 answer = response.text.strip()
-
                 retry = 0
                 while "final answer" not in answer.lower() and retry < MAX_RETRIES:
-                    print(f"  ...waiting for FINAL ANSWER (retry {retry+1}/{MAX_RETRIES})")
+                    print(f"  ...waiting for FINAL ANSWER (retry {retry + 1}/{MAX_RETRIES})")
                     sleep(RETRY_DELAY)
                     follow_up = flash_model.generate_content("Please give only the FINAL ANSWER.")
                     answer = follow_up.text.strip()
@@ -154,8 +184,9 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
             is_correct = pred_clean == gold
 
             result = {
+                "task": task_name,
                 "question": question,
-                "context": context,
+                "context": sample.get("text", ""),
                 "gold_answer": gold,
                 "model_response": answer,
                 "normalized_prediction": pred_clean,
@@ -166,8 +197,9 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
             with open(results_file, "a") as f:
                 f.write(json.dumps(result) + "\n")
 
-            print(f"  ✔ Predicted: {pred_clean} | Correct: {gold} | {'Correct' if is_correct else 'Wrong'}")
+            print(f"  ✔ Predicted: {pred_clean} | Gold: {gold} | {'Correct' if is_correct else 'Wrong'}")
 
+            total += 1
             if is_correct:
                 correct += 1
 
@@ -177,24 +209,32 @@ def run_benchmark(task_name, model_name, num_samples, offset, output_dir, server
             print(f"  ✖ Error: {e}")
             continue
 
-    acc = correct / (i + 1) if i + 1 else 0
-    print(f"\nFinal Accuracy: {correct}/{i+1} = {acc:.2%}")
-    print(f"Results saved to: {results_file}")
+    acc = correct / total if total else 0
+    print(f"Accuracy on {task_name}: {correct}/{total} = {acc:.2%}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--task", type=str, default="contract_qa", help="LegalBench task name")
     parser.add_argument("--model_name", type=str, required=True, choices=["hashiru", "flash2.0"])
-    parser.add_argument("--num", type=int, default=10)
-    parser.add_argument("--offset", type=int, default=0)
     parser.add_argument("--output_dir", type=str, default="legalbench_results/")
+    parser.add_argument("--total_samples", type=int, default=250)
     args = parser.parse_args()
 
-    run_benchmark(
-        task_name=args.task,
-        model_name=args.model_name,
-        num_samples=args.num,
-        offset=args.offset,
-        output_dir=args.output_dir
-    )
+    task_list = get_dataset_config_names("nguha/legalbench")
+    random.seed(42)
+    random.shuffle(task_list)
+
+    results_file = os.path.join(args.output_dir, f"legalbench_all_{args.model_name}.jsonl")
+    samples_per_task = max(1, args.total_samples // len(task_list))
+    extra = args.total_samples % len(task_list)
+
+    for idx, task in enumerate(task_list):
+        num_samples = samples_per_task + (1 if idx < extra else 0)
+        run_benchmark(
+            task_name=task,
+            model_name=args.model_name,
+            num_samples=num_samples,
+            offset=0,
+            output_dir=args.output_dir,
+            results_file=results_file
+        )
