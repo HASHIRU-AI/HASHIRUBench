@@ -7,20 +7,22 @@ import random
 import os
 import re
 from datetime import datetime
+from google import genai
+from google.genai import types
 
 # Fetch the official Wordle guess list from GitHub
-WORD_LIST_SOLUTION_URL = "https://gist.githubusercontent.com/scholtes/94f3c0303ba6a7768b47583aff36654d/raw/73f890e1680f3fa21577fef3d1f06b8d6c6ae318/wordle-La.txt"
-WORD_LIST_POSSIBLE_URL = "https://gist.githubusercontent.com/scholtes/94f3c0303ba6a7768b47583aff36654d/raw/73f890e1680f3fa21577fef3d1f06b8d6c6ae318/wordle-Ta.txt"
+WORD_LIST_URL = "https://raw.githubusercontent.com/tabatkins/wordle-list/main/words"
+KEY=""
 random.seed(12345)
+client = genai.Client(api_key=KEY)
 
-def load_word_list(url):
-    resp = requests.get(url)
+def load_word_list():
+    resp = requests.get(WORD_LIST_URL)
     resp.raise_for_status()
     words = [w.strip().lower() for w in resp.text.splitlines()]
     return [w for w in words if len(w) == 5 and w.isalpha()]
 
-WORD_LIST = load_word_list(WORD_LIST_SOLUTION_URL)
-WORD_LIST_POSSIBLE = load_word_list(WORD_LIST_POSSIBLE_URL) + WORD_LIST
+WORD_LIST = load_word_list()
 
 def compute_feedback(guess: str, solution: str) -> str:
     """Return a 5-char string of G/Y/X feedback."""
@@ -53,16 +55,17 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
     results = []
 
     for gi in range(num_games):
-        client = Client("http://127.0.0.1:7860/hashiru/")
-        client.predict(
-            modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
-            api_name="/update_model"
-        )
+        # client = Client("http://127.0.0.1:7860/hashiru/")
+        # client.predict(
+        #     modeIndexes=["ENABLE_AGENT_CREATION","ENABLE_LOCAL_AGENTS","ENABLE_CLOUD_AGENTS","ENABLE_TOOL_CREATION","ENABLE_TOOL_INVOCATION","ENABLE_RESOURCE_BUDGET","ENABLE_ECONOMY_BUDGET"],
+        #     api_name="/update_model"
+        # )
         # client.predict(
         #     modeIndexes=[],
         #     api_name="/update_model"
         # )
-        client.reset_session()
+        # client.reset_session()
+        chat = client.chats.create(model="gemini-2.0-flash")
         solution = random.choice(WORD_LIST)
         print(f"Game {gi+1}/{num_games}, solution: {solution}")
         guesses, attempts = [], 0
@@ -71,28 +74,33 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
         prompt = (
                 "We are playing a game of Wordle. The solution is a 5-letter word.\n"
                 f"Your task is to guess the solution word within {max_guesses} attempts.\n"
-                "You will be given feedback after each guess in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist in the word).\n"
-                "Letters can be repeated in the word.\n"
-                "Remember, this is a complex problem so use tools and agents to carefully think to find the solution.\n"
+                "You will be given feedback in the form of G (Correct position), Y (in the word but wrong position), and X (does not exist in the word).\n"
+                "Your task is to guess the solution word.\n"
+                "Use agents and tools as nessesary to guess the word.\n"
                 "From now on, the final response should be in this format: \{\"guess\":\"<WORD>\"\}.\n"
-                "I have selected the word, let's start the game"
+                "I have selected the word, now start guessing!\n"
             )
         letters_not_in_word = set()
 
         response = ""
-        _history = []
         
         while attempts < max_guesses:
             print(f"Attempt {attempts + 1}/{max_guesses}")
             print("prompt:", repr(prompt))
-            response, _history = client.predict(
-                {"text": prompt.strip()},
-                _history,
-                api_name="/chat",
-            )
+            # response, _history = client.predict(
+            #     {"text": prompt.strip()},
+            #     _history,
+            #     api_name="/chat",
+            # )
+            try:
+                response = chat.send_message(prompt.strip())
+            except Exception as e:
+                print("Warning: empty guess; retrying without using a turn.")
+                prompt = "The guess is empty. This could be due to timeout or output not matching the expected format (\{\"guess\":\"<WORD>\"\}). Please try again.\n"
+                time.sleep(60)
+                continue
             print("response:", repr(response))
-            print("history:", repr(_history))
-            guess = sanitize_guess(_history[-1].get("content", ""))
+            guess = sanitize_guess(response.text)
             if not guess:
                 print("Warning: empty guess; retrying without using a turn.")
                 prompt = "The guess is empty. This could be due to timeout or output not matching the expected format (\{\"guess\":\"<WORD>\"\}). Please try again.\n"
@@ -103,7 +111,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 prompt = "The guess is not 5 letters. Please try again.\n"
                 time.sleep(5)
                 continue
-            if guess not in WORD_LIST_POSSIBLE:
+            if guess not in WORD_LIST:
                 print(f"guess: {guess} not in word list")
                 prompt = "The guess is not in the word list. Please try again.\n"
                 time.sleep(5)
@@ -128,6 +136,9 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
             if feedback == "GGGGG":
                 break
             time.sleep(5)
+        history = []
+        for message in chat.get_history():
+            history.append({"role": message.role, "content": message.parts[0].text})
         results.append(
             {
                 "solution": solution,
@@ -135,7 +146,7 @@ def benchmark_wordle(num_games: int = 10, max_guesses: int = 6):
                 "solved": guesses[-1][1] == "GGGGG" if guesses else False,
                 "turns": len(guesses),
                 "time": time.time() - start_time,
-                "conversation": _history
+                "conversation": history
             }
         )
         # write entire results to file

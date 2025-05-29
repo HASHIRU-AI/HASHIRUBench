@@ -1,0 +1,8 @@
+{
+    "question": "Which Lloyd Webber musical premiered in the US on 10th December 1993?",
+    "correct_answer": "Sunset Boulevard",
+    "prediction": "According to the Wikipedia article, the first American production of Sunset Boulevard opened at the Shubert Theatre in Century City, Los Angeles, California, on **9 December 1993**.\n",
+    "exact_match": false,
+    "f1_score": 0.15384615384615385,
+    "time_elapsed": 5.733501195907593
+}

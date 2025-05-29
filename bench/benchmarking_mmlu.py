@@ -170,16 +170,16 @@ def single_request(client, single_question, cot_examples_dict, exist_result):
     cot_examples = cot_examples_dict[category]
     question = single_question["question"]
     options = single_question["options"]
-    prompt = (
-            f"The following are multiple choice questions (with answers) about {category}"
-            "You MUST NOT ask the user for clarifications. "
-            "You MUST use tools/agents to help you. "
-            "Deep-research and answer the question always. "
-            "\"The answer is (X)\" at the end.\n\n"
-        )
-    # prompt = "The following are multiple choice questions (with answers) about {}. Use agents and tools to think step by" \
-    #          " step and then output the answer in the format of \"The answer is (X)\" at the end.\n\n" \
-    #     .format(category)
+    # prompt = (
+    #         f"The following are multiple choice questions (with answers) about {category}"
+    #         "You MUST NOT ask the user for clarifications. "
+    #         "You MUST use tools/agents to help you. "
+    #         "Deep-research and answer the question always and then output the answer in the format of "
+    #         "\"The answer is (X)\" at the end.\n\n"
+    #     )
+    prompt = prompt = "The following are multiple choice questions (with answers) about {}. Think step by" \
+             " step and then output the answer in the format of \"The answer is (X)\" at the end.\n\n" \
+        .format(category)
     for each in cot_examples:
         prompt += format_example(each["question"], each["options"], each["cot_content"])
     input_text = format_example(question, options)

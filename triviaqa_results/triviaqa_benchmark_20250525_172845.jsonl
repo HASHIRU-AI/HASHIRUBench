@@ -1,0 +1,9 @@
+{
+    "question": "Which Lloyd Webber musical premiered in the US on 10th December 1993?",
+    "correct_answer": "Sunset Boulevard",
+    "prediction": "Error",
+    "exact_match": 0,
+    "f1_score": 0,
+    "time_elapsed": 0,
+    "error": "tuple indices must be integers or slices, not str"
+}
