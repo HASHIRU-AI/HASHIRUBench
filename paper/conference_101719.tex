@@ -40,10 +40,6 @@
   \IEEEauthorblockN{Harshil Patel}
   \IEEEauthorblockA{\textit{UC Davis} \\
     hpppatel@ucdavis.edu}
-  \and
-  \IEEEauthorblockN{Saisha Shetty}
-  \IEEEauthorblockA{\textit{UC Davis} \\
-    spshetty@ucdavis.edu}
   \thanks{\IEEEauthorrefmark{1}These authors contributed equally to this work.}
 }
 \maketitle
@@ -315,7 +311,7 @@ We present preliminary results from our experiments, focusing on the academic pa
         \toprule
         \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{p-value} & \textbf{Avg. Time (s)} & \textbf{Resource Use} \\
         \midrule
-        Paper Review    & \textbf{58}   & N/A & N/A       & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
+        ICLR 2023 Paper Review    & \textbf{58}   & N/A & N/A       & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
         \midrule % Added horizontal rule
         JailbreakBench  & \textbf{100}  & N/A & N/A       & $\approx$1   & Negligible (CEO model) \\
         \midrule % Added horizontal rule
@@ -369,10 +365,13 @@ Current limitations in HASHIRU include the CEO's capacity for highly complex tas
 
 Future work will address these limitations and enhance HASHIRU's capabilities. Priorities include improving CEO intelligence, exploring distributed cognition, developing a comprehensive tool management lifecycle, creating adaptive economic models, and rigorous benchmarking. A core initiative is introducing calibration for tool invocation: HASHIRU will assess its internal confidence against a tool's potential output and reliability, invoking tools when uncertain or if a tool promises higher utility, thereby aiming for more efficient and accurate task resolution. This development draws on research in LLM uncertainty quantification and confidence calibration (e.g., \cite{manggalaqa, spiess2024calibration}), crucial given the expanding tool use by LLMs (e.g., \cite{Qin2023ToolLLM}). Other key efforts will focus on system explainability through ablation, expanding the local model repertoire, specializing architecture for tasks like paper review, code, and formalizing an ethical safety framework.
 
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper introduced HASHIRU, a novel multi-agent system framework designed for enhanced flexibility, resource efficiency, and adaptability. Through its hierarchical control structure, dynamic agent lifecycle management driven by an economic model, a hybrid intelligence approach prioritizing local LLMs, and integrated autonomous tool creation, HASHIRU addresses key limitations in current MAS. Preliminary evaluations and case studies demonstrate its potential to perform complex tasks, manage resources effectively, and autonomously extend its capabilities. HASHIRU offers a promising direction for developing more robust, efficient, and adaptable intelligent systems.
+
 \section*{Acknowledgments}
-
-This research was supported by Hugging Face, Lambda Labs, and Groq. We also thank Prof. Lifu Huang for providing the dataset for the academic paper review task.
-
+This research was supported by Hugging Face, Lambda Labs, and Groq. We thank Prof. Lifu Huang for providing the dataset used in the academic paper review task. We also appreciate Saisha Shetty for her initial contributions to the project. Finally, we acknowledge Roshan Sevalia and Ravi Sevalia for their moral support and encouragement during the development of HASHIRU.
 \bibliography{references}
 \bibliographystyle{plain}
 
