@@ -1,0 +1,171 @@
+\documentclass[twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic} % From original paper
+\usepackage{graphicx}
+\usepackage{textcomp} % From original paper
+\usepackage{xcolor} % From original paper
+\usepackage{hyperref}
+\usepackage{longtable} % From original paper
+\usepackage{tabularx} % From original paper
+% \usepackage{tcolorbox} % From original paper - commented out as user/assistant boxes are not directly used here
+\usepackage{array} % From original paper
+\usepackage{booktabs}
+\usepackage{xurl}
+\usepackage{cite}
+\usepackage[margin=1in]{geometry} % Added for standard margins
+
+% \tcbuselibrary{skins} % From original paper - for tcolorbox
+
+% Define styles for user and assistant boxes (from original, for reference if needed)
+% \newtcolorbox{userbox}{colback=blue!5,colframe=blue!40!black,title=User}
+% \newtcolorbox{assistantbox}{colback=gray!10,colframe=black,title=Assistant}
+\newcommand{\lt}{\ensuremath <} % From original paper
+\newcommand{\gt}{\ensuremath >} % From original paper
+
+\title{Technical Appendix for HASHIRU: Hierarchical Agent System for Hybrid Intelligent Resource Utilization}
+\author{Kunal Pai, Parth Shah, and Harshil Patel}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This technical appendix provides a detailed overview of the HASHIRU system, complementing the main paper. HASHIRU (Hierarchical Agent System for Hybrid Intelligent Resource Utilization) is a novel Multi-Agent System (MAS) framework designed to enhance flexibility, resource efficiency, and adaptability. It features a ``CEO" agent dynamically managing specialized ``employee" agents, prioritizing local LLMs and incorporating an economic model for resource allocation. This document elaborates on its architecture, components, operational mechanisms, dataset utilization, safety measures, and benchmark results.
+\end{abstract}
+
+\section{Introduction and Motivation}
+Rapid advancements in Large Language Models (LLMs) \cite{brown2020language, devlin2019bert, raffel2020exploring} have spurred the development of autonomous Multi-Agent Systems (MAS) \cite{dorri2018multi, wooldridge2009introduction}. These systems show promise in complex domains like scientific discovery \cite{boiko2023emergent} and software engineering \cite{qian2023communicative}. However, contemporary agentic frameworks often suffer from several limitations. These include \textbf{Rigidity}, where predefined roles hinder adaptation \cite{zhang2023building}; \textbf{Resource Obliviousness}, characterized by a lack of mechanisms to optimize computational resources (API costs, memory, CPU), leading to inefficiency \cite{park2023generative}; \textbf{Model Homogeneity}, the practice of defaulting to a single powerful LLM, thereby missing efficiency gains from diverse models \cite{zhou2023agents}; and \textbf{Limited Autonomous Tool Creation}, which restricts dynamic self-improvement \cite{wang2023voyager, yao2022react, parisi2022talm}.
+HASHIRU is introduced to address these limitations by providing a dynamic, resource-aware, and adaptable MAS framework.
+
+\section{Background and Relation to Prior Work}
+Intelligent agent concepts have evolved significantly from symbolic AI \cite{russell2010artificial, shoham1994agent} to current LLM-driven frameworks \cite{wang2023survey, xi2023rise}. While hierarchical MAS models offer clear control \cite{dorri2018multi, horling2004survey}, they can introduce bottlenecks \cite{gaston2005agenta, gaston2005agentb}. HASHIRU employs a CEO-Employee hierarchy but distinguishes itself through \textbf{dynamic team composition}, unlike systems with static hierarchies (e.g., CrewAI \cite{crewai}, ChatDev \cite{qian2023communicative}). Its resource management is centralized and budget-constrained, contrasting with market-based mechanisms \cite{clearwater1996market} or systems with implicit cost tracking like AutoGen \cite{wu2023autogen} and LangGraph \cite{langgraph}. HASHIRU’s hybrid intelligence prioritizes local models (via Ollama \cite{ollama}), differing from systems reliant on large proprietary APIs (e.g., GPT-4 \cite{openai2023gpt4}, Claude 3 \cite{anthropic2024claude}). Furthermore, its integrated autonomous API tool creation advances beyond predefined toolsets common in systems like ReAct \cite{yao202202react} or those with basic function calling \cite{openai_func_calling}, aiming for greater autonomy akin to Voyager \cite{wang2023voyager}.
+
+\section{HASHIRU System Architecture}
+\label{sec:tech_architecture}
+HASHIRU's architecture is designed to overcome rigidity, resource obliviousness, and limited adaptability through a hierarchical, dynamically managed MAS optimized for hybrid resource utilization.
+
+\subsection{Overview}
+The key tenets of HASHIRU are \textbf{Dynamic Hierarchical Coordination}, where the CEO manages strategy, task allocation, and dynamic team composition; \textbf{Dynamic Lifecycle Management}, meaning employees are hired/fired based on runtime needs and resource constraints, governed by an economic model; \textbf{Hybrid Intelligence}, involving a strategic preference for LLMs within a predefined budget, while flexibly accessing external APIs/models; \textbf{Explicit Resource Management}, which ensures continuous monitoring and control of costs (financial, memory) against budgets; and \textbf{Adaptive Tooling}, which utilizes predefined tools alongside autonomous creation of new API tools.
+
+\subsection{Hierarchical Structure: CEO and Employee Agents}
+
+\subsubsection{CEO Agent}
+The CEO Agent serves as a \textbf{singleton, central coordinator, and system entry point}. Its \textbf{responsibilities} are comprehensive, including interpreting user queries/tasks, decomposing main tasks into sub-tasks, identifying required capabilities, managing the Employee agent pool (see Section \ref{subsec:tech_dynamic_mgmt}), assigning sub-tasks, monitoring Employee progress/performance, synthesizing results into final output, managing the overall resource budget (see Section \ref{subsec:tech_resource_mgmt}), and initiating new tool creation (see Section \ref{subsec:tech_tooling}). For its \textbf{implementation}, it employs Gemini 2.0 Flash~\cite{gemini20flash} as the core LLM. The agent's reasoning capabilities are \textbf{enhanced} as its system prompt is engineered to evoke inherent chain-of-thought (CoT) processes~\cite{wei2022chain}, complementing its baseline reasoning, tool use support, and cost-efficiency.
+
+\subsubsection{Employee Agents}
+Employee Agents are \textbf{specialized agents instantiated by the CEO for specific sub-tasks}, with each typically wrapping an LLM or providing dedicated tool access.
+Their \textbf{characteristics} include \textit{Specialization}, meaning capabilities are tailored to task types (e.g., code generation, data analysis, information retrieval); \textit{Dynamic Existence}, as they are created and destroyed by the CEO based on operational needs, performance, and resource constraints; \textit{Task Execution}, where they receive task specifications from the CEO, execute them, and return results; and \textit{Resource Consumption}, with associated costs (API fees, estimated hardware utilization for local models) being tracked by the system.
+For their \textbf{implementation models}, Employees are constructed using diverse base models. Examples include smaller local models like Mistral~7B~\cite{jiang2023mistral} and Llama~3~\cite{llama3herd}, as well as more capable models like Gemini~1.5~\cite{gemini1.5_report}, Qwen2.5~\cite{qwen2.5_report}, and DeepSeek-R1~\cite{deepseekr1_report}. The CEO agent configures these employees via tailored system prompts generated based on specific task requirements.
+\textbf{Model Access Modalities} are varied. \textit{Local Execution} involves models running locally, often facilitated by Ollama~\cite{ollama}. \textit{External APIs} allow integration with external models such as Gemini 2.5 Flash~\cite{gemini25flash}, Qwen QwQ~\cite{QwenQwQ32B2025}, with future considerations for Llama 4~\cite{Llama4Herd2025} and Mistral Saba~\cite{MistralSaba2025}. Access is managed via platforms like Hugging Face~\cite{huggingface2025}, Groq~\cite{groq2025}, and Lambda.ai~\cite{lambda2025}.
+
+\subsection{Dynamic Agent Lifecycle Management}
+\label{subsec:tech_dynamic_mgmt}
+A core innovation is the CEO's dynamic management (hiring/firing) of Employee agents. This process is driven by a cost-benefit analysis aimed at optimizing task performance within defined resource constraints.
+\textbf{Hiring Triggers} occur if a sub-task requires capabilities not currently available or if existing agents provide them inefficiently. Conversely, \textbf{Firing Triggers} may lead to an agent being fired if it underperforms, remains idle for extended periods, becomes too costly, or if resource limits (budget, memory) are being approached.
+The \textbf{Decision Factors} influencing these actions include Task Requirements (specific capabilities needed for pending sub-tasks), Agent Performance (historical success rates, quality of output, operational efficiency), and Operational Costs (API fees, estimated compute for local models, and other associated costs).
+HASHIRU incorporates an \textbf{economic model} to regulate this lifecycle. This model includes a \textbf{Hiring Cost (``Starting Bonus'')}, a one-time cost incurred upon instantiation of local models, representing setup overhead, which can be quantitatively scaled based on the model's resource profile (e.g., higher for models requiring more VRAM). An \textbf{Invocation Cost (``Salary'')} is a recurring cost applied each time a local model is used, reflecting the operational load (e.g., inferred compute, system resource engagement). Finally, an \textbf{Expense Cost} is a recurring cost for external API calls (e.g., OpenAI, Anthropic), typically calculated based on token usage as per the provider's pricing. These transaction costs discourage excessive agent churn, promoting team stability and efficient resource utilization.
+
+\subsection{Hybrid Intelligence and Model Management}
+HASHIRU is architected for \textbf{hybrid intelligence}, strategically leveraging a diverse set of cognitive resources.
+A key principle is \textbf{Local-First Prioritization}, giving preference to smaller (typically 3B--7B parameters), cost-effective local LLMs, often managed via Ollama~\cite{ollama}. This approach enhances efficiency, reduces reliance on external APIs, and offers potential benefits in terms of privacy and latency.
+The system also supports \textbf{Integrated External Resources}. This means it can flexibly integrate External LLM APIs, providing access to powerful foundation models (e.g., Gemini 2.5 Flash~\cite{gemini25flash}) when task complexity demands it, subject to cost-benefit analysis by the CEO. It can also integrate External Tool APIs from third-party software and data sources, and Self-Created APIs, which are tools dynamically generated by HASHIRU itself (see Section \ref{subsec:tech_tooling}).
+The \textbf{CEO-Led Resource Selection} process involves the CEO managing this heterogeneous pool of models and tools, selecting the most appropriate resource based on task difficulty, required capabilities, and budgetary constraints.
+
+\subsection{Resource Monitoring and Control}
+\label{subsec:tech_resource_mgmt}
+Explicit resource management is a central feature of HASHIRU. The system, coordinated by the CEO, monitors both \textbf{Financial Costs}, which include the accumulation of external API costs (based on documented pricing) and the internal ``hiring'' and ``invocation'' costs from the economic model for local agents, and \textbf{Memory Usage}, referring to the memory footprint (e.g., VRAM) of active Employee agents. For local models, this is estimated based on known requirements and tracked as a percentage of a predefined total available budget (e.g., a 16\,GiB VRAM capacity might represent 100\% of the local model memory budget).
+
+\subsection{Tool Utilization and Autonomous Creation}
+\label{subsec:tech_tooling}
+HASHIRU's CEO agent utilizes predefined tools (functions, APIs, databases) to interact with external environments and perform actions beyond text generation, aligning with established practices \cite{yao2022react, openai_func_calling}.
+A distinctive feature is \textbf{integrated, autonomous tool creation}. This process unfolds in three main stages. First, for \textbf{Specification}, the CEO defines the tool's specification, including inputs, outputs, and desired functionality, when it identifies a missing capability. Second, in \textbf{Commissioning Logic Generation}, it commissions the generation of the tool's logic (code), which may involve using external APIs (with provided credentials) or leveraging a specialized code-generating employee agent. Finally, during \textbf{Deployment}, the generated logic is deployed as a new, callable API endpoint within the HASHIRU ecosystem.
+This autonomous creation process employs a few-shot prompting approach, where HASHIRU analyzes existing tools within its system to learn how to specify and implement new ones \cite{brown2020language}. The system can then iteratively refine the generated tool code by analyzing execution errors or suboptimal outputs, promoting self-correction.
+
+\subsection{Memory Function: Learning from Experience}
+\label{subsec:tech_memory}
+HASHIRU incorporates a \textbf{Memory Function} enabling the CEO to learn from past interactions, particularly errors, and adapt its strategies.
+The \textbf{Mechanism} involves a historical log that stores significant past events, focusing on failed attempts or suboptimal outcomes. For \textbf{Retrieval}, when encountering new or recurring challenges, the system queries this memory. Retrieval relies on semantic similarity between the current context (task description, recent actions, error messages) and stored memory entries. Embeddings are generated by the \textbf{all-MiniLM-L6-v2} model \cite{wang2020minilmdeepselfattentiondistillation}, and \textbf{cosine similarity} determines relevance. In terms of \textbf{Application}, retrieved memories provide contextual information, helping agents understand past failures and adjust strategies to avoid repeating mistakes. This process aligns with Retrieval-Augmented Generation (RAG) concepts \cite{lewis2021retrievalaugmentedgenerationknowledgeintensivenlp} and supports learning by reflecting on past actions, similar to ideas in self-reflective RAG \cite{asai2023self} and frameworks like Reflexion \cite{shinn2023reflexion}.
+
+\section{Case Studies Demonstrating Self-Improvement}
+\textbf{Case Study 1: Self-Generating Cost Model for Agent Specialization}, details how HASHIRU automated the research and integration of local model performance data and cloud API costs into its internal economic model using web search capabilities (Commit: \url{https://github.com/kunpai/HASHIRU/commit/70dc268b121cbd7c50c6691645d8a99912766965}).
+
+\textbf{Case Study 2: Autonomous Tool Integration for the CEO Agent}, shows HASHIRU demonstrating autonomous integration of new tools by employing few-shot learning from existing tool templates and iterative bug fixing, directly committing new tools to its codebase (Commits: \url{https://github.com/kunpai/HASHIRU/commit/193e10b2b00917256b7cc01cb3aa5ac7b6a6c174}, and tool example \url{https://github.com/HASHIRU-AI/HASHIRU/blob/main/src/tools/default_tools/get_website_tool.py}).
+
+\textbf{Case Study 3: Autonomous Budget Management}, showcases a self-regulating mechanism to monitor budget allocation and prevent overspending, with HASHIRU refusing external API use when budget limits were exceeded. This addresses common issues with token-based billing \cite{gemini_reddit, openai_sos, openai_costs}.
+
+\textbf{Case Study 4: Learning from Experience via Error Analysis and Knowledge Retrieval}, explains how HASHIRU learned from incorrect responses by generating linguistic critiques and actionable guidance (akin to verbal reinforcement learning \cite{shinn2023reflexion}), then indexing this feedback into a RAG system \cite{lewis2021retrievalaugmentedgenerationknowledgeintensivenlp} for future retrieval. This mirrors RLHF principles \cite{ziegler2019fine, ouyang2022training}.
+
+\section{Experimental Setup}
+
+\subsection{Evaluation Objectives}
+Experiments were designed to evaluate HASHIRU's performance, efficiency, and adaptability. Further objectives included assessing the impact of dynamic management with economic constraints on resource utilization and task success, the effectiveness of the hybrid (local-first) intelligence strategy, and the system's ability to autonomously create and utilize tools.
+
+\subsection{Evaluation Tasks and Datasets}
+\label{subsec:tech_tasks}
+A diverse set of tasks was selected.
+\subsubsection{Academic Paper Review}
+For this task, HASHIRU was tasked to simulate peer review by generating a review summary and recommending acceptance/rejection for ICLR 2023 papers. The \textbf{Dataset} consisted of 50 papers from ICLR 2023. The \textbf{Rationale} for this task was to probe the system's ability in decomposition of complex criteria, delegation to specialized agents, and resource management for large documents.
+
+\subsubsection{Reasoning and Problem-Solving Tasks}
+To evaluate broad reasoning, knowledge retrieval, and problem-solving, several benchmarks were employed. These included \textbf{Humanity's Last Exam \cite{phan2025humanitysexam}}, a test of graduate-level technical knowledge and complex reasoning (using a subset of 40 questions). Another was the \textbf{ARC (AI2 Reasoning Challenge) \cite{boratko2018systematic}}, featuring challenging multiple-choice science questions that demand knowledge retrieval, logical inference, and multi-step problem-solving (using a mixed set of 100 questions). \textbf{StrategyQA \cite{geva2021strategyqa}} provided yes/no questions requiring implicit multi-step reasoning with evidence from Wikipedia (subset of 100 questions). For mathematical and scientific problem-solving, \textbf{JEEBench \cite{arora-etal-2023-llms}} was used, containing pre-engineering problems from IIT JEE-Advanced that require long-horizon reasoning (subset of 120 questions). Arithmetic and algebraic reasoning were further assessed using \textbf{GSM8K \cite{cobbe2021gsm8k}}, which consists of grade school math word problems evaluating multi-step mathematical reasoning (subset of 100 questions); this benchmark is crucial for assessing arithmetic and algebraic reasoning. \textbf{SVAMP \cite{patel2021nlp, patel2021svamp}} provided math word problems designed to test question sensitivity and robust reasoning against structural alterations (subset of 100 questions). Finally, \textbf{MMLU \cite{hendrycks2021measuringmassivemultitasklanguage}} evaluated pretrained knowledge across 57 diverse subjects (STEM, humanities, law, ethics) from elementary to professional levels, with subsets used for law (112 questions), math (110 questions), and psychology (127 questions).
+
+\subsubsection{Safety Evaluation}
+The safety evaluation \textbf{Task} was to assess whether the CEO's delegation mechanism compromises its inherent safety protocols. The \textbf{Dataset} used was a 50-prompt subset of JailbreakBench \cite{chao2024jailbreakbench}, which includes adversarial prompts designed to test LLM safety robustness \cite{zou2023universal, tdc2023, mazeika2024harmbench}. This evaluation is \textbf{Critical} for ensuring responsible operation when task delegation is involved.
+
+\subsection{Baselines for Comparison}
+The primary baseline for reasoning tasks was Gemini 2.0 Flash~\cite{gemini20flash} operating in isolation; this choice was made to isolate the architectural benefits of HASHIRU over a single competent agent. For paper reviews (which are multi-agent by design) and JailbreakBench (which evaluates HASHIRU's internal safety integrity), direct comparison to a single isolated agent was not applicable in the same way; HASHIRU's performance was evaluated directly in these cases. Statistical significance of differences was assessed using t-tests~\cite{student1908probable}.
+
+\subsection{Evaluation Metrics}
+The evaluation metrics included \textbf{Task Success Rate / Quality}, measured as the percentage of tasks completed correctly (binary for most tasks) or the quality of output (e.g., coherence, relevance for paper reviews). \textbf{Resource Consumption} was another key metric, focusing on wall-clock time per task; financial costs and memory usage were also important considerations in HASHIRU's design and evaluation philosophy. Finally, \textbf{System Dynamics and Adaptability} were assessed qualitatively, including the number and utility of autonomously created tools and agents where applicable.
+
+\section{Results and Discussion}
+
+\begin{table*}[htbp]
+    \centering
+    \caption{Summary of Experimental Results. SR denotes Success Rate.}
+    \label{tab:tech_results}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}lccccc@{}}
+        \toprule
+        \textbf{Task} & \textbf{HASHIRU SR (\%)} & \textbf{Baseline SR (\%)} & \textbf{p-value} & \textbf{Avg. Time (s)} & \textbf{Resource Use (Illustrative HASHIRU Config)} \\
+        \midrule
+        ICLR 2023 Paper Review    & \textbf{58}   & N/A & N/A       & $\approx$100 & Low (3 Gemini 1.5 Flash~\cite{gemini15flash} models) \\
+        JailbreakBench  & \textbf{100}  & N/A & N/A       & $\approx$1   & Negligible (CEO model) \\
+        AI2 Reasoning Challenge & \textbf{96.5}   & 95  & \gt 0.05 & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        Humanity's Last Exam & \textbf{5}    & 2.5 & \gt 0.05 & $\approx$15   & Moderate to High (1 DeepSeek-R1 7B~\cite{deepseekr1_report}) \\
+        StrategyQA      & \textbf{85}   & 82  & \gt 0.05 & $\approx$2   & Negligible (Tools) \\
+        JEEBench        & \textbf{80}   & 68.3  & \textbf{\lt 0.05} & $\approx$9   & Negligible (Tools) \\
+        GSM8K           & \textbf{96}   & 61  & \textbf{\lt 0.01} & $\approx$2   & Low (Tools \& 1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        SVAMP           & \textbf{92}   & 84  & \textbf{\lt 0.05} & $\approx$3   & Negligible (Tools) \\
+        MMLU Law        & 58.4   & \textbf{61.6}  & \gt 0.05 & $\approx$3   & Low to Moderate (Tools \& 1 Gemini 2.5 Flash~\cite{gemini25flash}) \\
+        MMLU Math       & \textbf{91.8}   & 87.7  & \textbf{\lt 0.05} & $\approx$4   & Negligible (Tools) \\
+        MMLU Psychology & \textbf{78.7}   & 78.3  & \gt 0.05 & $\approx$3   & Low to Moderate (Tools \& 1 Gemini 2.5 Flash~\cite{gemini25flash}) \\
+        \bottomrule
+    \end{tabular}
+    }
+\end{table*}
+
+\textbf{Key Discussion Points from Results:}
+The results offer several insights. Regarding the \textbf{Academic Paper Review}, HASHIRU's 58\% success rate highlighted its capability to manage complex, multi-perspective tasks by dynamically forming an appropriate team of agents (three Gemini 1.5 Flash~\cite{gemini15flash} models). In terms of \textbf{Safety (JailbreakBench)}, a 100\% success rate in safely handling adversarial prompts by the CEO agent (without harmful delegation) underscored that HASHIRU's delegation mechanism did not compromise the foundational model's safety.
+For \textbf{Reasoning Tasks}, statistically significant improvements were observed on JEEBench ($p \lt 0.05$), GSM8K ($p \lt 0.01$), SVAMP ($p \lt 0.05$), and MMLU Math ($p \lt 0.05$), indicating strong performance in mathematical and formal reasoning, often due to effective tool integration. Notably, for GSM8K, HASHIRU achieved 96\% versus the baseline's 61\%. On other tasks such as AI2 Reasoning Challenge, Humanity's Last Exam, StrategyQA, MMLU Law, and MMLU Psychology, HASHIRU showed comparable or slightly better performance than the baseline, though these differences were not always statistically significant. This suggests areas where more specialized agent configurations or advanced reasoning strategies could be beneficial. For instance, on Humanity's Last Exam, HASHIRU (5\%) doubled the baseline's score (2.5\%), indicating better handling of highly complex tasks by deploying more potent specialized agents (DeepSeek-R1 7B~\cite{deepseekr1_report}).
+Overall, the results support HASHIRU's core contributions: dynamic resource-aware agent lifecycle management, a hybrid intelligence model, the potential for autonomous tool creation (demonstrated in case studies and implicit in benchmark tool use), and an effective economic model.
+
+\section{Limitations and Future Work}
+\label{sec:tech_limitations_future_work}
+Current limitations include the CEO's capacity for extremely complex task decomposition and strategic planning, the scalability of the centralized control model in very large agent teams, and the robustness and generalization of autonomous tool creation and alignment. Further challenges involve the calibration and dynamic adjustment of the economic model parameters, and optimizing the memory function for very long histories and complex query contexts.
+
+Future work will focus on several areas. These include enhancing CEO intelligence (e.g., through more sophisticated planning algorithms) and exploring distributed cognition and decentralized control mechanisms for certain sub-systems. Efforts will also be directed towards developing a comprehensive tool management lifecycle (encompassing creation, validation, versioning, and deprecation) and creating adaptive economic models that learn and adjust parameters based on system performance and resource availability. Rigorous benchmarking against a wider range of MAS frameworks is planned. A significant addition will be introducing \textbf{calibration for tool invocation}: HASHIRU will assess its internal confidence against a tool's potential output and reliability, invoking tools when its confidence is low or if a tool promises significantly higher utility. This draws on research in LLM uncertainty quantification and confidence calibration (e.g., \cite{manggalaqa, spiess2024calibration}) and is crucial given expanding tool use by LLMs (e.g., \cite{Qin2023ToolLLM}). Other future directions involve improving system explainability through ablation studies, expanding the repertoire of supported local models, specializing the architecture further for tasks like advanced paper review and complex coding projects, and formalizing an ethical and safety framework guiding agent behavior and tool creation.
+
+\section{Conclusion}
+This technical appendix has detailed the architecture, mechanisms, and evaluation of HASHIRU. By integrating hierarchical control, dynamic resource-aware agent management, a hybrid local-first intelligence strategy, and autonomous tool creation, HASHIRU offers a significant step towards more robust, efficient, and adaptable multi-agent systems.
+
+\hrulefill
+
+\section*{Acknowledgments from Original Paper}
+This research was supported by Hugging Face, Lambda Labs, and Groq. We thank Prof. Lifu Huang for providing the dataset used in the academic paper review task. We also appreciate Saisha Shetty for her initial contributions to the project. Finally, we acknowledge Roshan Sevalia, Ravi Sevalia and Pallavi Gupta for their moral support and encouragement during the development of HASHIRU.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
