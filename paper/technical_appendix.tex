@@ -121,9 +121,10 @@ The evaluation metrics included \textbf{Task Success Rate / Quality}, measured a
 
 \section{Results and Discussion}
 
+% Add this in your document body where the table is
 \begin{table*}[htbp]
     \centering
-    \caption{Summary of Experimental Results. SR denotes Success Rate.}
+    \caption{Summary of Experimental Results. SR denotes Success Rate.\protect\footnotemark}
     \label{tab:tech_results}
     \resizebox{\textwidth}{!}{%
     \begin{tabular}{@{}lccccc@{}}
@@ -145,6 +146,11 @@ The evaluation metrics included \textbf{Task Success Rate / Quality}, measured a
     \end{tabular}
     }
 \end{table*}
+% Place the footnotetext immediately after the table environment.
+% The \addtocounter ensures that \footnotetext uses the correct footnote number
+% that \footnotemark just set (as \footnotemark increments the counter).
+\addtocounter{footnote}{0} 
+\footnotetext{Experiments were run on a MacBook M1 2020 edition.}
 
 \textbf{Key Discussion Points from Results:}
 The results offer several insights. Regarding the \textbf{Academic Paper Review}, HASHIRU's 58\% success rate highlighted its capability to manage complex, multi-perspective tasks by dynamically forming an appropriate team of agents (three Gemini 1.5 Flash~\cite{gemini15flash} models). In terms of \textbf{Safety (JailbreakBench)}, a 100\% success rate in safely handling adversarial prompts by the CEO agent (without harmful delegation) demonstrated that HASHIRU's delegation mechanism did not compromise the foundational model's safety.

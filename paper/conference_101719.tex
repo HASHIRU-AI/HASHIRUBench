@@ -14,6 +14,7 @@
 \usepackage{array}
 \usepackage{booktabs}
 \usepackage{xurl}
+\usepackage{tablefootnote} % For \tablefootnote
 \tcbuselibrary{skins}
 
 % Define styles for user and assistant boxes
@@ -300,13 +301,13 @@ We present preliminary results from our experiments, focusing on the academic pa
 
 \begin{table}[htbp]
     \centering
-    \caption{Summary of Experimental Results. SR denotes Success Rate.}
+    \caption{Summary of Experimental Results. SR denotes Success Rate.\tablefootnote{Experiments were run on a MacBook M1 2020 edition.}}
     \label{tab:results}
     \begin{tabular}{
                     >{\raggedright\arraybackslash}p{1.2cm}
                     >{\centering\arraybackslash}p{1cm}
                     >{\centering\arraybackslash}p{1cm}
-                    >{\centering\arraybackslash}p{.7cm}
+                    >{\centering\arraybackslash}p{0.7cm} % Corrected width from .7cm to 0.7cm
                     >{\centering\arraybackslash}p{1cm}
                     >{\raggedright\arraybackslash}p{1.5cm}
                     }
@@ -317,27 +318,28 @@ We present preliminary results from our experiments, focusing on the academic pa
         \midrule % Added horizontal rule
         JailbreakBench  & \textbf{100}  & N/A & N/A       & $\approx$1   & Negligible (CEO model) \\
         \midrule % Added horizontal rule
-        AI2 Reasoning Challenge & \textbf{96.5}   & 95  & \gt 0.05 & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        AI2 Reasoning Challenge & \textbf{96.5}   & 95  & \textgreater 0.05 & $\approx$2   & Low (1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
         \midrule % Added horizontal rule
-        Humanity's Last Exam & \textbf{5}    & 2.5 & \gt 0.05 & $\approx$15   & Moderate to High (1 DeepSeek-R1 7B~\cite{deepseekr1_report}) \\
+        Humanity's Last Exam & \textbf{5}    & 2.5 & \textgreater 0.05 & $\approx$15   & Moderate to High (1 DeepSeek-R1 7B~\cite{deepseekr1_report}) \\
         \midrule % Added horizontal rule
-        StrategyQA      & \textbf{85}   & 82  & \gt 0.05 & $\approx$2   & Negligible (Tools) \\
+        StrategyQA      & \textbf{85}   & 82  & \textgreater 0.05 & $\approx$2   & Negligible (Tools) \\
         \midrule % Added horizontal rule
-        JEEBench        & \textbf{80}   & 68.3  & \textbf{\lt 0.05} & $\approx$9   & Negligible (Tools) \\
+        JEEBench        & \textbf{80}   & 68.3  & \textbf{\textless 0.05} & $\approx$9   & Negligible (Tools) \\
         \midrule % Added horizontal rule
-        GSM8K           & \textbf{96}   & 61  & \textbf{\lt 0.01} & $\approx$2   & Low (Tools \& 1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
+        GSM8K           & \textbf{96}   & 61  & \textbf{\textless 0.01} & $\approx$2   & Low (Tools \& 1 Gemini 1.5 8B~\cite{gemini15flash8b}) \\
         \midrule % Added horizontal rule
-        SVAMP           & \textbf{92}   & 84  & \textbf{\lt 0.05} & $\approx$3   & Negligible (Tools) \\
+        SVAMP           & \textbf{92}   & 84  & \textbf{\textless 0.05} & $\approx$3   & Negligible (Tools) \\
         \midrule % Added horizontal rule
-        MMLU Law        & 58.4   & \textbf{61.6}  & \gt 0.05 & $\approx$3   & Low to Moderate (Tools \& 1 Gemini 2.5 Flash~\cite{gemini25flash}) \\
+        MMLU Law        & 58.4   & \textbf{61.6}  & \textgreater 0.05 & $\approx$3   & Low to Moderate (Tools \& 1 Gemini 2.5 Flash~\cite{gemini25flash}) \\
         \midrule % Added horizontal rule
-        MMLU Math       & \textbf{91.8}   & 87.7  & \textbf{\lt 0.05} & $\approx$4   & Negligible (Tools) \\
+        MMLU Math       & \textbf{91.8}   & 87.7  & \textbf{\textless 0.05} & $\approx$4   & Negligible (Tools) \\
         \midrule % Added horizontal rule
-        MMLU Psychology & \textbf{78.7}   & 78.3  & \gt 0.05 & $\approx$3   & Low to Moderate (Tools \& 1 Gemini 2.5 Flash~\cite{gemini25flash}) \\
+        MMLU Psychology & \textbf{78.7}   & 78.3  & \textgreater 0.05 & $\approx$3   & Low to Moderate (Tools \& 1 Gemini 2.5 Flash~\cite{gemini25flash}) \\
         \bottomrule
     \end{tabular}
     % \caption*{Note: HASHIRU SR (\%) values are bolded for emphasis. Replace example t-test values with actual results. The booktabs package authors generally recommend minimizing horizontal rules for readability (typically only toprule, midrule after headers, and bottomrule).}
 \end{table}
+
 The preliminary results presented in Table~\ref{tab:results} offer initial validation for HASHIRU's architectural design and its potential to address key limitations in contemporary multi-agent systems. The findings across diverse tasks highlight the benefits of dynamic hierarchical coordination, hybrid intelligence, and resource-aware management.
 
 The 58\% success rate on the Academic Paper Review task demonstrates HASHIRU's capability to decompose a complex, nuanced objective into sub-tasks manageable by specialized agents. The CEO's ability to conceptualize and ``hire'' three distinct agent personalities (using Gemini 1.5 Flash models~\cite{gemini15flash}) with low overall resource use (average time $\approx$100s) points to the effectiveness of the dynamic lifecycle management and the hybrid intelligence approach, favoring capable yet efficient models.
