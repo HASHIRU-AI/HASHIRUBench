@@ -275,7 +275,7 @@ To quantify HASHIRU's benefits, we compare its performance against the baseline 
 We chose Gemini 2.0 Flash as the baseline due to our architecture's efficacy being tied to augmenting the capabilities of a single agent. This choice allows us to isolate the impact of our dynamic management and hybrid intelligence features, providing a clear comparison point.
 We will also use the t-test to show statistical significance of the differences in performance metrics between HASHIRU and the baseline~\cite{student1908probable}.
 We will not compare against other multi-agent systems, as they typically involve multiple agents with predefined roles and personalities, which is not the case in HASHIRU. Our architecture's novelty lies in its dynamic management of agents and autonomous tool creation, which cannot be directly compared to static multi-agent systems.
-If our architecture is effective, we expect to see higher accuracy compared to the baseline, while also being more cost-effective than using a single powerful model by invoking free online tools and lesser powerful models to synthesize the results of running the tools.
+If our architecture is effective, we expect to see higher accuracy compared to the baseline, while also being more resource-aware by invoking free online tools and lesser powerful models to synthesize the results of running the tools.
 
 For paper reviews, we just evaluate HASHIRU's accuracy in predication of decisions of acceptance with the ground truth. Since the task is, by design, involving multiple agents, it is not possible to replicate autonomously with a single agent.
 While we could invoke three Gemini 2.0 Flash agents, it would not be a fair comparison, as the ``personalities'' and ``expertise'' of the agents would have to be manually specified, which is not the case in HASHIRU.
@@ -361,9 +361,9 @@ Collectively, these findings suggest that HASHIRU's architecture, with its empha
 \section{Limitations and Future Work}
 \label{sec:limitations_future_work}
 
-Current limitations in HASHIRU include the CEO's capacity for highly complex tasks and the scalability of its centralized control. Further development is also needed for robust autonomous tool creation and alignment, effective economic model calibration, and optimizing memory for extensive histories.
+A key limitation in HASHIRU is that the CEO agent's communication is restricted to a single hierarchical level; employee agents cannot spawn additional sub-agents, limiting hierarchical depth. Further development is also needed for robust autonomous tool creation and alignment, effective economic model calibration, and optimizing memory for extensive histories. We intend to further investigate the system's cost-effectiveness, particularly analyzing the trade-offs between leveraging local models versus external APIs, and how these choices affect task-specific performance.
 
-Future work will address these limitations and enhance HASHIRU's capabilities. Priorities include improving CEO intelligence, exploring distributed cognition, developing a comprehensive tool management lifecycle, creating adaptive economic models, and rigorous benchmarking. A core initiative is introducing calibration for tool invocation: HASHIRU will assess its internal confidence against a tool's potential output and reliability, invoking tools when uncertain or if a tool promises higher utility, thereby aiming for more efficient and accurate task resolution. This development draws on research in LLM uncertainty quantification and confidence calibration (e.g., \cite{manggalaqa, spiess2024calibration}), crucial given the expanding tool use by LLMs (e.g., \cite{Qin2023ToolLLM}). Other key efforts will focus on system explainability through ablation, expanding the local model repertoire, specializing architecture for tasks like paper review, code, and formalizing an ethical safety framework.
+Future work will address these limitations and enhance HASHIRU's capabilities. Priorities include improving CEO intelligence, exploring distributed cognition, developing a comprehensive tool management lifecycle, and rigorous benchmarking. A core initiative is introducing calibration for tool invocation: HASHIRU will assess its internal confidence against a tool's potential output and reliability, invoking tools when uncertain or if a tool promises higher utility, thereby aiming for more efficient and accurate task resolution. This development draws on research in LLM uncertainty quantification and confidence calibration (e.g., \cite{manggalaqa, spiess2024calibration}), crucial given the expanding tool use by LLMs (e.g., \cite{Qin2023ToolLLM}). Other key efforts will focus on system explainability through ablation and cost-benefit analysis, expanding the local model repertoire, specializing architecture for tasks like paper review, code, and formalizing an ethical safety framework.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -425,7 +425,7 @@ In this example (Figures \ref{fig:memory_example}, \ref{fig:memory_example2}), w
         \begin{assistantbox}
         Memories
         
-        Memories: [’The user is vegetarian.’]
+        Memories: [`The user is vegetarian.']
         
         I see. My apologies for the confusion. I had a conflicting memory that you were vegetarian. I will remove that memory and proceed with finding a bacon pasta recipe.
         
