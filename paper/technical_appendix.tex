@@ -57,7 +57,7 @@ The CEO Agent serves as a \textbf{singleton, central coordinator, and system ent
 Employee Agents are \textbf{specialized agents instantiated by the CEO for specific sub-tasks}, with each typically wrapping an LLM or providing dedicated tool access.
 Their \textbf{characteristics} include \textit{Specialization}, meaning capabilities are tailored to task types (e.g., code generation, data analysis, information retrieval); \textit{Dynamic Existence}, as they are created and destroyed by the CEO based on operational needs, performance, and resource constraints; \textit{Task Execution}, where they receive task specifications from the CEO, execute them, and return results; and \textit{Resource Consumption}, with associated costs (API fees, estimated hardware utilization for local models) being tracked by the system.
 For their \textbf{implementation models}, Employees are constructed using diverse base models. Examples include smaller local models like Mistral~7B~\cite{jiang2023mistral} and Llama~3~\cite{llama3herd}, as well as more capable models like Gemini~1.5~\cite{gemini1.5_report}, Qwen2.5~\cite{qwen2.5_report}, and DeepSeek-R1~\cite{deepseekr1_report}. The CEO agent configures these employees via tailored system prompts generated based on specific task requirements.
-\textbf{Model Access Modalities} are varied. \textit{Local Execution} involves models running locally, often facilitated by Ollama~\cite{ollama}. \textit{External APIs} allow integration with external models such as Gemini 2.5 Flash~\cite{gemini25flash}, Qwen QwQ~\cite{QwenQwQ32B2025}, with future considerations for Llama 4~\cite{Llama4Herd2025} and Mistral Saba~\cite{MistralSaba2025}. Access is managed via platforms like Hugging Face~\cite{huggingface2025}, Groq~\cite{groq2025}, and Lambda.ai~\cite{lambda2025}.
+\textbf{Model Access Modalities} are varied. \textit{Local Execution} involves models running locally, often facilitated by Ollama~\cite{ollama}. \textit{External APIs} allow integration with external models such as Gemini 2.5 Flash~\cite{gemini25flash}, Qwen QwQ~\cite{QwenQwQ32B2025}, Hermes3~\cite{teknium2024hermes}, with future considerations for Llama 4~\cite{Llama4Herd2025} and Mistral Saba~\cite{MistralSaba2025}. Access is managed via platforms like Hugging Face~\cite{huggingface2025}, Groq~\cite{groq2025}, and Lambda.ai~\cite{lambda2025}.
 
 \subsection{Dynamic Agent Lifecycle Management}
 \label{subsec:tech_dynamic_mgmt}
@@ -90,11 +90,11 @@ The \textbf{Mechanism} involves a historical log that stores significant past ev
 \section{Case Studies Demonstrating Self-Improvement}
 \textbf{Case Study 1: Self-Generating Cost Model for Agent Specialization}, details how HASHIRU automated the research and integration of local model performance data and cloud API costs into its internal economic model using web search capabilities (Commit: \url{https://github.com/kunpai/HASHIRU/commit/70dc268b121cbd7c50c6691645d8a99912766965}).
 
-\textbf{Case Study 2: Autonomous Tool Integration for the CEO Agent}, shows HASHIRU demonstrating autonomous integration of new tools by employing few-shot learning from existing tool templates and iterative bug fixing, directly committing new tools to its codebase (Commits: \url{https://github.com/kunpai/HASHIRU/commit/193e10b2b00917256b7cc01cb3aa5ac7b6a6c174}, and tool example \url{https://github.com/HASHIRU-AI/HASHIRU/blob/main/src/tools/default_tools/get_website_tool.py}).
+\noindent\textbf{Case Study 2: Autonomous Tool Integration for the CEO Agent}, shows HASHIRU demonstrating autonomous integration of new tools by employing few-shot learning from existing tool templates and iterative bug fixing, directly committing new tools to its codebase (Commits: \url{https://github.com/kunpai/HASHIRU/commit/193e10b2b00917256b7cc01cb3aa5ac7b6a6c174}, and tool example \url{https://github.com/HASHIRU-AI/HASHIRU/blob/main/src/tools/default_tools/get_website_tool.py}).
 
-\textbf{Case Study 3: Autonomous Budget Management}, showcases a self-regulating mechanism to monitor budget allocation and prevent overspending, with HASHIRU refusing external API use when budget limits were exceeded. This addresses common issues with token-based billing \cite{gemini_reddit, openai_sos, openai_costs}.
+\noindent\textbf{Case Study 3: Autonomous Budget Management}, showcases a self-regulating mechanism to monitor budget allocation and prevent overspending, with HASHIRU refusing external API use when budget limits were exceeded. This addresses common issues with token-based billing \cite{gemini_reddit, openai_sos, openai_costs}.
 
-\textbf{Case Study 4: Learning from Experience via Error Analysis and Knowledge Retrieval}, explains how HASHIRU learned from incorrect responses by generating linguistic critiques and actionable guidance (akin to verbal reinforcement learning \cite{shinn2023reflexion}), then indexing this feedback into a RAG system \cite{lewis2021retrievalaugmentedgenerationknowledgeintensivenlp} for future retrieval. This mirrors RLHF principles \cite{ziegler2019fine, ouyang2022training}.
+\noindent\textbf{Case Study 4: Learning from Experience via Error Analysis and Knowledge Retrieval}, explains how HASHIRU learned from incorrect responses by generating linguistic critiques and actionable guidance (akin to verbal reinforcement learning \cite{shinn2023reflexion}), then indexing this feedback into a RAG system \cite{lewis2021retrievalaugmentedgenerationknowledgeintensivenlp} for future retrieval. This mirrors RLHF principles \cite{ziegler2019fine, ouyang2022training}.
 
 \section{Experimental Setup}
 
@@ -162,7 +162,7 @@ This technical appendix has detailed the architecture, mechanisms, and evaluatio
 
 \hrulefill
 
-\section*{Acknowledgments from Original Paper}
+\section*{Acknowledgments}
 This research was supported by Hugging Face, Lambda Labs, and Groq. We thank Prof. Lifu Huang for providing the dataset used in the academic paper review task. We also appreciate Saisha Shetty for her initial contributions to the project. Finally, we acknowledge Roshan Sevalia, Ravi Sevalia and Pallavi Gupta for their moral support and encouragement during the development of HASHIRU.
 
 \bibliographystyle{plain}
